@@ -231,17 +231,17 @@ directories <- function(dataset_name, folderResults){
     n_folderReportsDataset = length(dir_folderReportsDataset)
   }
   
-  folderReportsKohonen = paste(folderReportsDataset, "/Kohonen", sep="")
-  if(dir.exists(folderReportsKohonen) == TRUE){
-    setwd(folderReportsKohonen)
-    dir_folderReportsKohonen = dir(folderReportsKohonen)
-    n_folderReportsKohonen = length(dir_folderReportsKohonen)
-  } else {
-    dir.create(folderReportsKohonen)
-    setwd(folderReportsKohonen)
-    dir_folderReportsKohonen = dir(folderReportsKohonen)
-    n_folderReportsKohonen = length(dir_folderReportsKohonen)
-  }
+  #folderReportsKohonen = paste(folderReportsDataset, "/Kohonen", sep="")
+  #if(dir.exists(folderReportsKohonen) == TRUE){
+  #  setwd(folderReportsKohonen)
+  #  dir_folderReportsKohonen = dir(folderReportsKohonen)
+  #  n_folderReportsKohonen = length(dir_folderReportsKohonen)
+  #} else {
+  #  dir.create(folderReportsKohonen)
+  #  setwd(folderReportsKohonen)
+  #  dir_folderReportsKohonen = dir(folderReportsKohonen)
+  #  n_folderReportsKohonen = length(dir_folderReportsKohonen)
+  #}
   
   # return folders
   retorno$folderResults = folderResults
@@ -253,7 +253,7 @@ directories <- function(dataset_name, folderResults){
   retorno$folderDatasetX = folderDatasetX
   retorno$folderReports = folderReports
   retorno$folderReportsDataset = folderReportsDataset
-  retorno$folderReportsKohonen = folderReportsKohonen
+  #retorno$folderReportsKohonen = folderReportsKohonen
   retorno$folderNamesLabels = folderNamesLabels
   retorno$folderLabelSpace = folderLabelSpace
   retorno$folderCV = folderCV
@@ -269,7 +269,7 @@ directories <- function(dataset_name, folderResults){
   retorno$dir_folderDatasets = dir_folderDatasets
   retorno$dir_folderDatasetX = dir_folderDatasetX
   retorno$dir_folderReports = dir_folderReports
-  retorno$dir_folderReportsKohonen = dir_folderReportsKohonen
+  #retorno$dir_folderReportsKohonen = dir_folderReportsKohonen
   retorno$dir_folderNamesLabels = dir_folderNamesLabels
   retorno$dir_folderLabelSpace = dir_folderLabelSpace
   retorno$dir_folderCV = dir_folderCV
@@ -286,7 +286,7 @@ directories <- function(dataset_name, folderResults){
   retorno$n_folderDatasetX = n_folderDatasetX
   retorno$n_folderReports = n_folderReports
   retorno$n_folderReportsDataset = n_folderReportsDataset
-  retorno$n_folderReportsKohonen = n_folderReportsKohonen
+  #retorno$n_folderReportsKohonen = n_folderReportsKohonen
   retorno$n_folderNamesLabels = n_folderNamesLabels
   retorno$n_folderLabelSpace = n_folderLabelSpace
   retorno$n_folderCV = n_folderCV
