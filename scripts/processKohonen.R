@@ -748,9 +748,9 @@ selectExclusivesLabels <- function(ds, namesLabels){
       gc()
     } # fim da partição
     
-    setwd(FolderSplit)
-    write.csv(ncl_final, paste("fold-", f, "-all-selected-partitions.csv", sep=""), row.names = FALSE)
-    write.csv(ncl_final_b, paste("fold-", f, "-all-selected-partitions-binary.csv", sep=""), row.names = FALSE)
+    #setwd(FolderSplit)
+    #write.csv(ncl_final, paste("fold-", f, "-all-selected-partitions.csv", sep=""), row.names = FALSE)
+    #write.csv(ncl_final_b, paste("fold-", f, "-all-selected-partitions-binary.csv", sep=""), row.names = FALSE)
     
     if(interactive()==TRUE){ flush.console() }
     gc()
@@ -862,10 +862,14 @@ verifyGroupsEmpty <- function(ds, namesLabels){
       
       resumePartitions2 = resumePartitions[-1,]
       
-      setwd(FolderSplit)
+      setwd(FolderIPSP)
       write.csv(resumePartitions2, paste("fold-",f,"-new-summary-partitions.csv", sep=""), row.names = FALSE)
       
-      setwd(FolderIPSP)
+      Folder = paste(diretorios$folderReportsDataset, "/FinalPartitions", sep="")
+      if(dir.exists(Folder)==FALSE){
+        dir.create(Folder)
+      }
+      setwd(Folder)
       write.csv(resumePartitions2, paste("fold-",f,"-new-summary-partitions.csv", sep=""), row.names = FALSE)
       
       nomesDosRotulos = partition3[,1]
@@ -942,6 +946,10 @@ verifyGroupsEmpty <- function(ds, namesLabels){
       write.csv(labelsPerGroups2, paste("total-labels-per-groups-partition-", p, "-.csv", sep=""))
       write.csv(particao2, paste("new-final-partition-", p, "-.csv", sep=""))
       
+      Folder = paste(diretorios$folderReportsDataset, "/FinalPartitions", sep="")
+      setwd(Folder)
+      write.csv(particao2, paste("new-final-partition-", p, "-.csv", sep=""))
+      
       p = p + 1 # increment partition
       if(interactive()==TRUE){ flush.console() }
       gc()
@@ -1011,19 +1019,6 @@ generatedPartitionsKohonen <- function(ds, resLS, namesLabels, number_dataset, n
   write.csv(timesKohonen, paste(dataset_name, "-kohonen-RunTime.csv"))
   cat("\n##################################################################################################")
 
-  cat("\n\n################################################################################################")  
-  cat("\n#Compress results kohonen \n")
-  setwd(diretorios$folderResultsKohonen)
-  str = paste("tar -zcvf ", dataset_name, "-results-kohonen.tar.gz ", diretorios$folderResultsDataset, sep="")
-  print(system(str))
-  cat("\n##################################################################################################")
-
-  cat("\n\n################################################################################################")    
-  cat("\n#Copy file results to reports \n")
-  str4 = paste("cp ", diretorios$folderResultsKohonen, "/", dataset_name, "-results-kohonen.tar.gz ", diretorios$folderReportsKohonen, sep="")
-  print(system(str4))
-  cat("\n##################################################################################################")
-  
   if(interactive()==TRUE){ flush.console() }
   gc()
   cat("\n##################################################################################################")

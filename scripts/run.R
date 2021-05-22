@@ -116,15 +116,9 @@ gpkh <- function(number_dataset, number_cores, number_folds, folderResults){
 
   cat("\n\n################################################################################################")
   cat("\nRuntime")
-  timesExecute = rbind(timesLabelSpace, timeKohonen)
+  timesExecute = rbind(timeLabelSpace, timeKohonen)
   setwd(diretorios$folderReportsDataset)
-  write.csv(timesExecute, "RunTime.csv")
-  cat("\n##################################################################################################")
-  
-  cat("\n\n################################################################################################")      
-  cat("\nDelete folder  \n")
-  str = paste("rm -r ", diretorios$folderResults, sep="")
-  print(system(str))
+  write.csv(timesExecute, "RunTime-Kohonen.csv")
   cat("\n##################################################################################################")
   
   cat("\n\n################################################################################################")

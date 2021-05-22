@@ -128,6 +128,8 @@ diretorios = directories(dataset_name, folderResults)
 timeFinal <- system.time(results <- gpkh(args[1], number_cores, number_folds, folderResults))
 print(timeFinal)
 
+#timeFinal <- system.time(results <- gpkh(2, number_cores, number_folds, folderResults))
+
 
 ##################################################################################################
 # save the total time in rds format in the dataset folder                                        #
