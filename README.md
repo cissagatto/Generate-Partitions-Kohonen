@@ -1,1 +1,2 @@
-# Partitions-Kohonen-Multilabel
+# Generate Partitions Kohonen HClust
+
