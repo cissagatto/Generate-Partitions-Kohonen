@@ -392,7 +392,7 @@ joinWinnersInstances <- function(resLS, folderResults){
 #   Folders Created:                                                                                        #
 #   Files Created:                                                                                          #
 #############################################################################################################
-instancesPerNeurons <- function(ds){
+instancesPerNeurons <- function(ds, folderResults){
   
   if(interactive()==TRUE){ flush.console() }
   
@@ -470,7 +470,7 @@ instancesPerNeurons <- function(ds){
 #   Files Created:                                                                                          #
 #        LabelsPerNeuron.csv                                                                                #
 #############################################################################################################
-labelsPerNeurons <- function(ds){
+labelsPerNeurons <- function(ds, folderResults){
   
   if(interactive()==TRUE){ flush.console() }
   
@@ -556,7 +556,7 @@ labelsPerNeurons <- function(ds){
 #   Folders Created:                                                                                        #
 #   Files Created:                                                                                          #
 #############################################################################################################
-selectExclusivesLabels <- function(ds, namesLabels){
+selectExclusivesLabels <- function(ds, namesLabels, folderResults){
   
   if(interactive()==TRUE){ flush.console() }
   
@@ -775,13 +775,14 @@ selectExclusivesLabels <- function(ds, namesLabels){
 #   Folders Created:                                                                                        #
 #   Files Created:                                                                                          #
 #############################################################################################################
-verifyGroupsEmpty <- function(ds, namesLabels){
+verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
 
   if(interactive()==TRUE){ flush.console() }
 
   #cat("\nGet directories")
   diretorios = directories(dataset_name, folderResults)
   
+  # /dev/shm/res/birds/InfoPartitions
   FolderInfoPart = paste(diretorios$folderResultsDataset, "/InfoPartitions", sep="")
   if(dir.exists(FolderInfoPart)==FALSE){
     dir.create(FolderInfoPart)
@@ -794,15 +795,21 @@ verifyGroupsEmpty <- function(ds, namesLabels){
     cat("\nFold: ", f)
     
     ############################################################################################################
-    #cat("\nGet folders")
+    # aqui é onde está as informações das atuais partições
+    # /dev/shm/res/birds/Kohonen/Split-1
     FolderSplit = paste(diretorios$folderResultsKohonen, "/Split-", f, sep="")
+    # /dev/shm/res/birds/Kohonen/Split-1/Partitions
     FolderAllPartitions = paste(FolderSplit, "/Partitions", sep="")
     
+    ############################################################################################################
+    # onde salvarei as informações das novas partições
+    # /dev/shm/res/birds/InfoPartitions/Split-1
     FolderIPSplit = paste(FolderInfoPart, "/Split-", f, sep="")
     if(dir.exists(FolderIPSplit)==FALSE){
       dir.create(FolderIPSplit)
     }
     
+    ############################################################################################################
     # cat("\nData frame")
     fold = c(0)
     partition = c(0)
@@ -819,11 +826,14 @@ verifyGroupsEmpty <- function(ds, namesLabels){
     while(p<=num.part){
       cat("\n\tPartition: ", p)
       
+      # pasta para guardar as novas informações das partições
+      # /dev/shm/res/birds/InfoPartitions/Split-1/Partition-2
       FolderIPSP = paste(FolderIPSplit, "/Partition-", p, sep="")
       if(dir.exists(FolderIPSP)==FALSE){
         dir.create(FolderIPSP)
       }
       
+      # pegando informações da partição atual
       FolderPartition = paste(FolderAllPartitions, "/Partition-", p, sep="")
       setwd(FolderPartition)
       partition = data.frame(read.csv(paste("fold-",f,"-selected-partition-",p,".csv", sep="")))
@@ -831,7 +841,7 @@ verifyGroupsEmpty <- function(ds, namesLabels){
       #cat("\nDeleting all empty groups")
       partition3 = partition[!sapply(partition, function(x) all(x == 0))]
       new.num.groups = ncol(partition3)-1
-      cat("\n\tNovo número de grupos: ", new.num.groups)
+      #cat("\n\tNovo número de grupos: ", new.num.groups)
       
       if(new.num.groups == 1 ){
         cat("\n\tUm grupo")
@@ -846,6 +856,7 @@ verifyGroupsEmpty <- function(ds, namesLabels){
         names(rotulosPorGrupo) = "totalLabels"
       }
       
+      # salva em "/dev/shm/res/birds/Kohonen/Split-1/Partitions/Partition-2"
       setwd(FolderPartition)
       write.csv(rotulosPorGrupo, paste("fold-",f,"-new-labels-per-group-partition-", p,".csv", sep=""))
         
@@ -853,44 +864,36 @@ verifyGroupsEmpty <- function(ds, namesLabels){
       fold = f
       partition = p
       resumePartitions = rbind(resumePartitions, data.frame(fold, partition, new.num.groups))
-      
-      setwd(FolderPartition)
-      write.csv(partition3, paste("fold-",f,"-new-partition-",p,".csv", sep=""), row.names = FALSE)
-      
-      setwd(FolderIPSP)
-      write.csv(partition3, paste("fold-",f,"-new-partition-",p,".csv", sep=""), row.names = FALSE)
-      
       resumePartitions2 = resumePartitions[-1,]
       
+      # salva em "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
       setwd(FolderIPSP)
       write.csv(resumePartitions2, paste("fold-",f,"-new-summary-partitions.csv", sep=""), row.names = FALSE)
       
-      Folder = paste(diretorios$folderReportsDataset, "/FinalPartitions", sep="")
-      if(dir.exists(Folder)==FALSE){
-        dir.create(Folder)
-      }
-      setwd(Folder)
-      write.csv(resumePartitions2, paste("fold-",f,"-new-summary-partitions.csv", sep=""), row.names = FALSE)
-      
+      # pegando os nomes dos rótulos
       nomesDosRotulos = partition3[,1]
       partition4 = partition3[,-1]
       partition4 = data.frame(t(partition4))
       colnames(partition4) = nomesDosRotulos
       
+      # total de rótulos por grupo
       group = c("")
       totalLabelsGroup = c(0)
       labelsPerGroups2 = data.frame(group, totalLabelsGroup)
       nomesGrupos = c(colnames(partition3))
       
+      # partição inteira: rótulos e grupos
       group2 = c(0)
       labels2 = ("")
       particao = data.frame(group2, labels2) 
       
+      # 
       y = 1
       w = y + 1
       while(y<=new.num.groups){
         cat("\n\tGroup: ", y)
         
+        # partição 3 é a partição resultante da função select exclusives labels
         res = partition3[-row(partition3)[partition3[,w] == 0],]
         
         # se não houver nenhum rótulo igual a zero
@@ -905,29 +908,33 @@ verifyGroupsEmpty <- function(ds, namesLabels){
           labels2 = namesLabels
           particao = rbind(particao, data.frame(group2, labels2))
           
+          # salva em "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
           setwd(FolderIPSP)
           write.csv(namesLabels, paste("labels-in-this-group-", y, "-.csv", sep=""))
           
-          setwd(FolderPartition)
-          write.csv(namesLabels, paste("labels-in-this-group-", y, "-.csv", sep="")) 
+          #setwd(FolderPartition)
+          #write.csv(namesLabels, paste("labels-in-this-group-", y, "-.csv", sep="")) 
           
         } else {
           #cat("\n\tAlguns rótulos fazem parte deste grupo")
           rotulosNesteGrupo = c(res[,1])
           
+          # cria a partiçã final
           group2 = y
           labels2 = rotulosNesteGrupo
           particao = rbind(particao, data.frame(group2, labels2))
           
+          # calcula total de rótulos neste grupo
           totalLabelsGroup = length(rotulosNesteGrupo)
           group = nomesGrupos[w]
           labelsPerGroups2 = rbind(labelsPerGroups2, data.frame(group, totalLabelsGroup))
           
+          # "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
           setwd(FolderIPSP)
           write.csv(rotulosNesteGrupo, paste("labels-in-this-group-", y, "-.csv", sep=""))
           
-          setwd(FolderPartition)
-          write.csv(rotulosNesteGrupo, paste("labels-in-this-group-", y, "-.csv", sep="")) 
+          #setwd(FolderPartition)
+          #write.csv(rotulosNesteGrupo, paste("labels-in-this-group-", y, "-.csv", sep="")) 
         }
         
         w = w + 1
@@ -938,16 +945,14 @@ verifyGroupsEmpty <- function(ds, namesLabels){
       labelsPerGroups2 = labelsPerGroups2[-1,]
       particao2 = particao[-1,]
       
+      # salva em "/dev/shm/res/birds/Kohonen/Split-1/Partitions/Partition-2"
       setwd(FolderPartition)
       write.csv(labelsPerGroups2, paste("total-labels-per-groups-partition-", p, "-.csv", sep=""))
       write.csv(particao2, paste("new-final-partition-", p, "-.csv", sep=""))
       
+      # salva em "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
       setwd(FolderIPSP)
       write.csv(labelsPerGroups2, paste("total-labels-per-groups-partition-", p, "-.csv", sep=""))
-      write.csv(particao2, paste("new-final-partition-", p, "-.csv", sep=""))
-      
-      Folder = paste(diretorios$folderReportsDataset, "/FinalPartitions", sep="")
-      setwd(Folder)
       write.csv(particao2, paste("new-final-partition-", p, "-.csv", sep=""))
       
       p = p + 1 # increment partition
@@ -994,22 +999,22 @@ generatedPartitionsKohonen <- function(ds, resLS, namesLabels, number_dataset, n
   
   cat("\n\n################################################################################################")
   cat("\n#Run: Calculate labels per neurons                                                                #")
-  timeLPN = system.time(labelsPerNeurons(ds))
+  timeLPN = system.time(labelsPerNeurons(ds, folderResults))
   cat("\n\n################################################################################################")
   
   cat("\n\n################################################################################################")
   cat("\n#Run: Calculate instances per neurons                                                             #")
-  timeIPN = system.time(instancesPerNeurons(ds))
+  timeIPN = system.time(instancesPerNeurons(ds, folderResults))
   cat("\n\n################################################################################################")
   
   cat("\n\n################################################################################################")
   cat("\n#Run: Verify Exclusive Labels                                                                     #")
-  timeSEL = system.time(selectExclusivesLabels(ds, namesLabels)) 
+  timeSEL = system.time(selectExclusivesLabels(ds, namesLabels, folderResults)) 
   cat("\n\n################################################################################################")
   
   cat("\n\n################################################################################################")
   cat("\n#Run: Verify Empty Groups                                                                         #")
-  timeVGE = system.time(verifyGroupsEmpty(ds, namesLabels)) 
+  timeVGE = system.time(verifyGroupsEmpty(ds, namesLabels, folderResults)) 
   cat("\n\n################################################################################################")
   
   cat("\n\n################################################################################################")

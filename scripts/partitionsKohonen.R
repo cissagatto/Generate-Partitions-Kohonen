@@ -150,19 +150,30 @@ save(results, file = str1)
 ##################################################################################################
 # compress the results for later transfer to the dataset folder                                  #
 ##################################################################################################
+#"/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
 cat("\nCompress results \n")
-setwd(diretorios$folderResults)
-str3 = paste("tar -zcvf ", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderResults, sep="")
-print(system(str3))
+setwd(diretorios$folderResultsInfoPar)
+str = paste("tar -zcvf ", dataset_name, "-info-partitions.tar.gz ", diretorios$folderResultsInfoPar, sep="")
+print(system(str))
+
+#"/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
+cat("\nCompress results \n")
+setwd(diretorios$folderResultsKohonen)
+str1 = paste("tar -zcvf ", dataset_name, "-kohonen.tar.gz ", diretorios$folderResultsKohonen, sep="")
+print(system(str1))
+
 
 
 ##################################################################################################
 # copy file                                                                                      #
 ##################################################################################################
 cat("\nCopy file tar \n")
-str4 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderReportsDataset, sep="")
-print(system(str4))
+str2 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-info-partitions.tar.gz ", diretorios$folderReportsDataset, sep="")
+print(system(str2))
 
+cat("\nCopy file tar \n")
+str3 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-info-kohonen.tar.gz ", diretorios$folderReportsDataset, sep="")
+print(system(str3))
 
 
 ########################################################################################################################
