@@ -32,7 +32,7 @@ The _"Id"_ of the dataset is a mandatory parameter in the command line to run al
 ### Step-4
 Confirms if the folder UTILS contains the following files: Clus.jar, R_csv_2_arff.jar, and weka.jar. Without these jars, the code not runs. Also, confirms if the folder _libs_ is present with the jars: Clus.jar, commons-math-1.0.jar, jgap.jar and weka.jar.
 
-NOTE: Please, pay attention to the datasets file names and the names in the CSV file. They must be the same, on the contrary, an error may occur.
+NOTE: Please, pay attention to the *datasets-hpmlk.csv* names and the names in the CSV file. They must be the same, on the contrary, an error may occur.
 
 ## GPKH Folder Strucutre
 
