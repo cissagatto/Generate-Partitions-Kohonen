@@ -12,9 +12,6 @@ This source code consists of an R project for R Studio and the following R scrip
 4. run.R
 5. partitionsKohonen.R
 
-## Jars
-Confirms if the folder UTILS contains the following files: Clus.jar, R_csv_2_arff.jar, and weka.jar. Without these jars, the code not runs. Also, confirms if the folder _libs_ is present with the jars: Clus.jar, commons-math-1.0.jar, jgap.jar and weka.jar.
-
 ## Preparing your experiment
 
 ## Step-1
@@ -26,21 +23,23 @@ This code is executed in X-fold cross-validation (mandatory!). First, you have t
 Place a copy of this code in _"C:/Users/[username]/Generate-Partitions-Kohonen"_ or _"/home/username/Generate-Partitions-Kohonen_. Our files are configured to obtain the paths of the folders from the root. You can change this in the code if you want.
 
 ## Step-3
-A file called "datasets-hpmlk.csv" must be in the *datasets* folder. This file is used to read information about the datasets and they are used in the code. All 74 datasets available in cometa are in this file. If you want to use another dataset, please, add the following information about the dataset in the file:
+A file called *datasets-hpmlk.csv* must be in the *datasets* folder. This file is used to read information about the datasets and they are used in the code. All 74 datasets available in cometa are in this file. If you want to use another dataset, please, add the following information about the dataset in the file:
 
 _Id, Name, Domain, Labels, Instances, Attributes, Inputs, Labelsets, Single, Max freq, Card, Dens, MeanIR, Scumble, TCS, AttStart, AttEnd, LabelStart, LabelEnd, xn, yn, gridn"
 
 The _"Id"_ of the dataset is a mandatory parameter (_n_dataset_) in the command line to run all code. The fields are used in a lot of internal functions. Please, make sure that this information is available before running the code. 
 
-NOTE: Please, pay attention to the datasets file names and the names in the CSV file. They must be the same, on the contrary, an error may occur.
+## Step-4
+Confirms if the folder UTILS contains the following files: Clus.jar, R_csv_2_arff.jar, and weka.jar. Without these jars, the code not runs. Also, confirms if the folder _libs_ is present with the jars: Clus.jar, commons-math-1.0.jar, jgap.jar and weka.jar.
 
+NOTE: Please, pay attention to the datasets file names and the names in the CSV file. They must be the same, on the contrary, an error may occur.
 
 ## GPKH Folder Strucutre
 
 <img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/folder_strcutre_gpkh.png" width="500">
 
 ## Software Requirements
-This code was develop in []. The R language version was []. Please make sure all the dependencies are installed (verify libraries.R). This code does not provide an installation of the packages.
+This code was develop in *RStudio Version 1.4.1106 © 2009-2021 RStudio, PBC "Tiger Daylily" (2389bc24, 2021-02-11) for Ubuntu Bionic Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.12.8 Chrome/69.0.3497.128 Safari/537.36*. The R Language version was: *R version 4.1.0 (2021-05-18) -- "Camp Pontanezen" Copyright (C) 2021 The R Foundation for Statistical Computing Platform: x86_64-pc-linux-gnu (64-bit)*. Please make sure all the dependencies are installed (verify libraries.R). This code does not provide any installation of the packages.
 
 ## Hardware Requirements
 This code may or may not be executed in parallel, however, it is highly recommended that you run it in parallel. The number of cores can be configured via the command line (_number_cores_). If *number_cores = 1* the code will run sequentially. In our experiments, we used ten cores. For reproducibility, we recommend that you also use ten cores.
