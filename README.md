@@ -48,7 +48,7 @@ This code may or may not be executed in parallel, however, it is highly recommen
 ## Results
 The results stored in the folder _OUTPUT_ it will be used in the next phase: Best-Partition-Silhoute or Best-Partition-MacroF1. The result for a dataset must be put in the folder _PARTITIONS_.
 
-
+<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/results_structure_gpk.png" width="500">
 
 ## RUN
 To run the code, open the terminal, enter */home/[username]/Generate-Partitions-Kohonen/scripts/* folder, and type:
