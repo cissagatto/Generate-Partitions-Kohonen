@@ -1,2 +1,4 @@
-# Generate Partitions Kohonen HClust
+# Generate Hyrid Partitions with Kohonen and HClust
+
+
 
