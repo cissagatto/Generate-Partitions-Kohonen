@@ -60,7 +60,7 @@ modelingLabelCorrelations <- function(ds, resLS, number_dataset, number_cores, n
   
   #cat("\nFrom 1 to 10 folds!")
   f = 1
-+-  kohonenParalel <- foreach(f = 1:number_folds) %dopar%{
+  kohonenParalel <- foreach(f = 1:number_folds) %dopar%{
     
     cat("\n\nFold: ", f)   
     

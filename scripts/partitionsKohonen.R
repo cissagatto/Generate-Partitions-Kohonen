@@ -203,6 +203,8 @@ destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen-
 comando = paste("rclone -v copy ", origem, " ", destino, sep="")
 system(comando)
 
+
+
 ##################################################################################################
 # del                                                                                      #
 ##################################################################################################
