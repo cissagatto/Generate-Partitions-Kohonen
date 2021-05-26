@@ -6,8 +6,11 @@ The figure bellow shows the fluxogram for this code:
 ## Scripts
 This source code consists of an R project for R Studio and the following R scripts:
 
-01. libraries.R
-02. utils.R
+1. libraries.R
+2. utils.R
+3. processKohonen.R
+4. run.R
+5. partitionsKohonen.R
 
 ## Jars
 Confirms if the folder UTILS contains the following files: Clus.jar, R_csv_2_arff.jar, and weka.jar. Without these jars, the code not runs. Also, confirms if the folder _libs_ is present with the jars: Clus.jar, commons-math-1.0.jar, jgap.jar and weka.jar.
