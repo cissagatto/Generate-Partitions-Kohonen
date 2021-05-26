@@ -44,6 +44,18 @@ This code was develop in *RStudio Version 1.4.1106 © 2009-2021 RStudio, PBC "Ti
 ## Hardware Requirements
 This code may or may not be executed in parallel, however, it is highly recommended that you run it in parallel. The number of cores can be configured via the command line (_number_cores_). If *number_cores = 1* the code will run sequentially. In our experiments, we used ten cores. For reproducibility, we recommend that you also use ten cores.
 
+This code was tested with the birds dataset in the following machine:
+
+System:
+  Host: bionote | Kernel: 5.8.0-53-generic | x86_64 bits: 64 | Desktop: Gnome 3.36.7 | Distro: Ubuntu 20.04.2 LTS (Focal Fossa) 
+  
+CPU:
+  Topology: 6-Core | model: Intel Core i7-10750H | bits: 64 | type: MT MCP | L2 cache: 12.0 MiB | Speed: 800 MHz | min/max: 800/5000 MHz 
+  Core speeds (MHz): | 1: 800 | 2: 800 | 3: 800 | 4: 800 | 5: 800 | 6: 800 | 7: 800 | 8: 800 | 9: 800 | 10: 800 | 11: 800 | 12: 800 |
+  
+_Then the experiment was executed in a cluster at UFSCar._
+
+
 ## Results
 The results stored in the folder _OUTPUT_ it will be used in the next phase: Best-Partition-Silhoute or Best-Partition-MacroF1. The result for a dataset must be put in the folder _PARTITIONS_ in the code https://github.com/cissagatto/Best-Partition-Silhouete.
 
