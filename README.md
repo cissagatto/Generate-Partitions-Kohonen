@@ -45,7 +45,7 @@ This code was develop in *RStudio Version 1.4.1106 © 2009-2021 RStudio, PBC "Ti
 This code may or may not be executed in parallel, however, it is highly recommended that you run it in parallel. The number of cores can be configured via the command line (_number_cores_). If *number_cores = 1* the code will run sequentially. In our experiments, we used ten cores. For reproducibility, we recommend that you also use ten cores.
 
 ## Results
-The results stored in the folder _OUTPUT_ it will be used in the next phase: Best-Partition-Silhoute or Best-Partition-MacroF1. The result for a dataset must be put in the folder _PARTITIONS_.
+The results stored in the folder _OUTPUT_ it will be used in the next phase: Best-Partition-Silhoute or Best-Partition-MacroF1. The result for a dataset must be put in the folder _PARTITIONS_ in the code https://github.com/cissagatto/Best-Partition-Silhouete.
 
 <img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/results_structure_gpk.png" width="500">
 
