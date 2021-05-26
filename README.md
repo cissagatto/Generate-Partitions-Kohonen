@@ -23,9 +23,9 @@ This code is executed in X-fold cross-validation (mandatory!). First, you have t
 Place a copy of this code in _"C:/Users/[username]/Generate-Partitions-Kohonen"_ or _"/home/username/Generate-Partitions-Kohonen_. Our files are configured to obtain the paths of the folders from the root. You can change this in the code if you want.
 
 ### Step-3
-A file called *datasets-hpmlk.csv* must be in the root project folder. This file is used to read information about the datasets and they are used in the code. All 74 datasets available in cometa are in this file. If you want to use another dataset, please, add the following information about the dataset in the file:
+A file called *datasets-hpmlk.csv* must be in the root project folder. This file is used to read information about the datasets and they are used in the code. All 74 datasets available in cometa (https://cometa.ujaen.es/) are in this file. If you want to use another dataset, please, add the following information about the dataset in the file:
 
-_Id, Name, Domain, Labels, Instances, Attributes, Inputs, Labelsets, Single, Max freq, Card, Dens, MeanIR, Scumble, TCS, AttStart, AttEnd, LabelStart, LabelEnd, xn, yn, gridn"
+*Id, Name, Domain, Labels, Instances, Attributes, Inputs, Labelsets, Single, Max freq, Card, Dens, MeanIR, Scumble, TCS, AttStart, AttEnd, LabelStart, LabelEnd, xn, yn, gridn*
 
 The _"Id"_ of the dataset is a mandatory parameter (_n_dataset_) in the command line to run all code. The fields are used in a lot of internal functions. Please, make sure that this information is available before running the code. 
 
