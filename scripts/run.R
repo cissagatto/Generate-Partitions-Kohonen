@@ -1,5 +1,5 @@
 ##################################################################################################
-
+# Modeling Labels Correlations with Kohonen and Partitioning the Label Space With HClust         #
 # Copyright (C) 2021                                                                             #
 #                                                                                                #
 # This code is free software: you can redistribute it and/or modify it under the terms of the    #
@@ -27,14 +27,11 @@
 # Configures the workspace according to the operating system                                     #
 ##################################################################################################
 sistema = c(Sys.info())
-shm = 0
 FolderRoot = ""
 if (sistema[1] == "Linux"){
-  shm = 1
-  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 } else {
-  shm = 0
-  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 }
 FolderScripts = paste(FolderRoot, "/scripts", sep="")
 
@@ -42,8 +39,6 @@ FolderScripts = paste(FolderRoot, "/scripts", sep="")
 ##################################################################################################
 # LOAD INTERNAL LIBRARIES                                                                        #
 ##################################################################################################
-
-FolderScripts = paste(FolderRoot, "/scripts/", sep="")
 
 setwd(FolderScripts)
 source("libraries.R")
@@ -89,42 +84,41 @@ gpkh <- function(number_dataset, number_cores, number_folds, folderResults){
   retorno = list()
   
   cat("\n\n################################################################################################")
-  cat("\n#Run: Get dataset information: ", number_dataset, "                                                  #")
+  cat("\n#Run: Get dataset information: ", number_dataset, "                                              #")
   ds = datasets[number_dataset,]
   names(ds)[1] = "Id"
   info = infoDataSet(ds)
   dataset_name = toString(ds$Name)
-  cat("\n#Dataset: ", dataset_name)   
   cat("\n##################################################################################################\n\n") 
   
   cat("\n\n################################################################################################")
-  cat("\n#Run: Get the names labels                                                                          #")
+  cat("\n# Run: Get the Names Labels                                                                      #")
   setwd(diretorios$folderNamesLabels)
   namesLabels = data.frame(read.csv(paste(dataset_name, "-NamesLabels.csv", sep="")))
   namesLabels = c(namesLabels$x)
   cat("\n##################################################################################################\n\n") 
   
-  cat("\n##################################################################################################\n\n") 
-  cat("\n#Run: Get the label space                                                                       #")
+  cat("\n##################################################################################################") 
+  cat("\n# Run: Get the label space                                                                       #")
   timeLabelSpace = system.time(resLS <- labelSpace(ds, dataset_name, number_folds, folderResults))
   cat("\n##################################################################################################\n\n") 
   
-  cat("\n##################################################################################################\n\n")   
-  cat("\n#Run: Get partitions kohonen                                                                         #")
+  cat("\n##################################################################################################")   
+  cat("\n#Run: Get partitions kohonen                                                                     #")
   timeKohonen = system.time(resGPK <- generatedPartitionsKohonen(ds, resLS, namesLabels, number_dataset, number_cores, number_folds, dataset_name, folderResults))
   cat("\n##################################################################################################\n\n") 
 
   cat("\n\n################################################################################################")
-  cat("\nRuntime")
+  cat("\n# Runtime                                                                                        #")
   timesExecute = rbind(timeLabelSpace, timeKohonen)
-  setwd(diretorios$folderReportsDataset)
-  write.csv(timesExecute, "RunTime-Kohonen.csv")
-  cat("\n##################################################################################################")
+  setwd(diretorios$folderDatasetResults)
+  write.csv(timesExecute, paste(dataset_name, "RunTime-gpkh.csv", sep=""))
+  cat("\n##################################################################################################\n\n")
   
   cat("\n\n################################################################################################")
   cat("\n#Stop Parallel")
   on.exit(stopCluster(cl))
-  cat("\n##################################################################################################")
+  cat("\n##################################################################################################\n\n")
   
   gc()
   cat("\n##################################################################################################")

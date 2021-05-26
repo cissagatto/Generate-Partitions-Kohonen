@@ -1,5 +1,5 @@
 ##################################################################################################
-
+# Modeling Labels Correlations with Kohonen and Partitioning the Label Space With HClust         #
 # Copyright (C) 2021                                                                             #
 #                                                                                                #
 # This code is free software: you can redistribute it and/or modify it under the terms of the    #
@@ -27,72 +27,53 @@
 # Configures the workspace according to the operating system                                     #
 ##################################################################################################
 sistema = c(Sys.info())
-shm = 0
 FolderRoot = ""
 if (sistema[1] == "Linux"){
-  shm = 1
-  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 } else {
-  shm = 0
-  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 }
 FolderScripts = paste(FolderRoot, "/scripts", sep="")
 
 
-
-#############################################################################################################
-# FUNCTION WSSPLOT                                                                                          # 
-#   Objective:                                                                                              #
-#      Generates the graph based on the sum of the group squares to find the optimal number o clusters.     #
-# Parameters:                                                                                               #
-#   data = codebooks vector                                                                                 #
-#   nc = ranges from 2 to grid                                                                              #
-#   seed =  seed for execution                                                                              #
-#############################################################################################################
-wssplot <- function(data, nc=nc, seed=1234){
-  wss <- (nrow(data)-1)*sum(apply(data,2,var))
-  for (i in 2:nc){
-    set.seed(seed)
-    wss[i] <- sum(kmeans(data, centers=i)$withinss)
-  }
-  plot(1:nc, wss, type="b", xlab="Number of Clusters", ylab="Within groups sum of squares", main="WSS_1")
-} # END
-
-
-
-
 ##################################################################################################
-# FUNCTION COMPUTE KOHONEN                                                                       #
-#   Objective                                                                                    #
-#      Modeling correlations using Kohonen                                                       #
-#   Parameters                                                                                   #
-#   Return                                                                                       #
+# FUNCTION MODELING LABEL CORRELATIONS WITH KOHONEN                                              #
+#   Objective:                                                                                   #
+#      Modeling label correlations using Kohonen                                                 #
+#   Parameters:                                                                                  #
+#      ds: information about the specific dataset                                                #
+#      resLS: label space from the specific dataset                                              #
+#      number_dataset: number of the specific dataset                                            #
+#      number_cores: number of cores to process in paralel                                       #
+#      number_folds: number of folds for the cross-validation                                    #
+#      folderResults: folder to process                                                          #
+#   Return:                                                                                      #          
+#      Graphics from Kohonen                                                                     #
+#      Modeled Kohonen: changes, codes, distances, units                                         #
 ##################################################################################################
-computeKohonen <- function(ds, resLS, number_dataset, number_cores, number_folds, folderResults){
+modelingLabelCorrelations <- function(ds, resLS, number_dataset, number_cores, number_folds, folderResults){
   
   if(interactive()==TRUE){ flush.console() }
   
+  #cat("\nGet directories")
   diretorios = directories(dataset_name, folderResults)
   
-  cat("\nFrom 1 to 10 folds!")
+  #cat("\nFrom 1 to 10 folds!")
   f = 1
-  kohonenParalel <- foreach(f = 1:number_folds) %dopar%{
++-  kohonenParalel <- foreach(f = 1:number_folds) %dopar%{
     
-    cat("\nFold: ", f)   
+    cat("\n\nFold: ", f)   
     
     ############################################################################################################
-    cat("\nLoad sources and packages")
+    #cat("\nLoad sources and packages")
     sistema = c(Sys.info())
-    shm = 0
     FolderRoot = ""
     if (sistema[1] == "Linux"){
-      shm = 1
-      FolderRoot = paste("/home/", sistema[7], "/HPML-K", sep="")
+      FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
     } else {
-      shm = 0
-      FolderRoot = paste("C:/Users/", sistema[7], "/HPML-K", sep="")
+      FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
     }
-    FolderScripts = paste(FolderRoot, "/scripts/", sep="")
+    FolderScripts = paste(FolderRoot, "/scripts", sep="")
     
     setwd(FolderScripts)
     source("libraries.R")
@@ -100,15 +81,12 @@ computeKohonen <- function(ds, resLS, number_dataset, number_cores, number_folds
     setwd(FolderScripts)
     source("utils.R")
     
-    setwd(FolderScripts)
-    source("miscellaneous.R")
-    
-    
     #############################################################################################################
     # COLORS                                                                                                    #
     #############################################################################################################
     n <- 100
     qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+    brewer.pal(7,"Greens")
     col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
     rainbowcols <- rainbow(20)
     coolBlueHotRed <- function(n, alpha = 1) {
@@ -133,6 +111,13 @@ computeKohonen <- function(ds, resLS, number_dataset, number_cores, number_folds
     }
     
     ############################################################################################################
+    #cat("\nCreate folder Graphic")
+    FolderGraphic = paste(FolderSplit, "/Graphics", sep="")
+    if(dir.exists(FolderGraphic)==FALSE){
+      dir.create(FolderGraphic)
+    }
+    
+    ############################################################################################################
     #cat("\nGet the Classes")
     classes = data.frame(resLS$Classes[f])
     classes = as.matrix(classes)
@@ -145,26 +130,31 @@ computeKohonen <- function(ds, resLS, number_dataset, number_cores, number_folds
     
     #cat("\nDefine the dimmension of the som grid. x and y became of the file dataset")
     som_grid = kohonen::somgrid(xdim = ds$xn, ydim = ds$yn, topo="rectangular")
-    setwd(folderM)
-    save(som_grid, file = 'som-grid.Rdata')
     
-    #cat("\nGenerating the model supersom")
-    nome = paste("fold-", f, "-superSom.Rdata", sep="")
+    # cat("\nGenerating the model supersom")
+    nome1 = paste("fold-", f, "-superSom.RData", sep="")
+    nome2 = paste("fold-", f, "-superSom.rds", sep="")
     setwd(folderM)
-    if(recalculate_map == F & file.exists(nome) == T){
+    if(recalculate_map == F & file.exists(nome1) == T){
       setwd(folderM)
-      load(nome)
+      load(nome1)
     } else{
-      #cat('\n| Calculating SuperSom |\n ')
       set.seed(123)
       model = kohonen::supersom(classes, grid = som_grid, rlen = n_iterations, alpha = c(1.0,0.01), 
                                 radius = 5, maxNA.fraction = .5, keep.data = TRUE)
       setwd(folderM)
-      save(model, file = nome)
+      save(model, file = nome1)
+      saveRDS(model, file = nome2)
     }
     
     #cat("\nSaving data about model")
-    cat("\nDistances")
+    
+    #cat("\nData")
+    #data = data.frame(model$data)
+    #setwd(folderM)
+    #write.csv(data, paste("fold-", f, "-data.csv", sep=""))
+    
+    #cat("\nDistances")
     distance = data.frame(model$distances)
     setwd(folderM)
     write.csv(distance, paste("fold-", f, "-distances.csv", sep=""))
@@ -193,15 +183,7 @@ computeKohonen <- function(ds, resLS, number_dataset, number_cores, number_folds
     #cat("\nExponentiate euclidean distance by distance on map")
     # ^ First operand raised to the power of second operand	a^b"
     dist_adj = dist_m ^ dist_on_map
-    
-    
-    ############################################################################################################
-    #cat("\nCreate folder Graphic")
-    FolderGraphic = paste(FolderSplit, "/Graphics", sep="")
-    if(dir.exists(FolderGraphic)==FALSE){
-      dir.create(FolderGraphic)
-    }
-    
+
     #cat("\n obtain the data from model supersom")
     data = data.frame(model$data)
     
@@ -224,7 +206,7 @@ computeKohonen <- function(ds, resLS, number_dataset, number_cores, number_folds
     dev.off()
     cat("\n")
     
-    #cat("\nNeigbhour")
+    cat("\nNeigbhour")
     setwd(FolderGraphic)
     pdf(paste("fold-", f, "-changes.pdf", sep=""), width = 10, height = 8)
     print(plot(model, type="dist.neighbours", palette.name=grey.colors))
@@ -266,63 +248,183 @@ computeKohonen <- function(ds, resLS, number_dataset, number_cores, number_folds
     dev.off()
     cat("\n")
     
+    if(interactive()==TRUE){ flush.console() }
+    gc()
+  } 
+  
+  if(interactive()==TRUE){ flush.console() }
+  gc()
+  
+  cat("\n##################################################################################################")
+  cat("\n# END MODELING THE LABEL CORRELATIONS WITH KOHONEN                                               #")
+  cat("\n##################################################################################################")
+  cat("\n\n\n\n")
+}
+
+
+
+##################################################################################################
+# FUNCTION PARTITIONING THE LABEL SPACE ACCORDINGLY WITH LABEL CORRELATIONS                      #
+#   Objective:                                                                                   #
+#       Using HClust to partitioning the label space considering the modeled label correlations  #
+#   Parameters:                                                                                  #
+#      ds: information about the specific dataset                                                #
+#      resLS: label space from the specific dataset                                              #
+#      number_dataset: number of the specific dataset                                            #
+#      number_cores: number of cores to process in paralel                                       #
+#      number_folds: number of folds for the cross-validation                                    #
+#      folderResults: folder to process                                                          #
+#   Return:                                                                                      #          
+#      Partitions with the groups of correlated neurons                                          #
+#      Graphics with the divisions of each groups of correlated neurons                          #
+##################################################################################################
+partitioningLabelSpace <- function(ds, resLS, number_dataset, number_cores, number_folds, folderResults){
+  
+  if(interactive()==TRUE){ flush.console() }
+  
+  #cat("\nGet directories")
+  diretorios = directories(dataset_name, folderResults)
+  
+  #cat("\nFrom 1 to 10 folds!")
+  f = 1
+  plsParalel <- foreach(f = 1:number_folds) %dopar%{
+    
+    cat("\n\nFold: ", f)   
     
     ############################################################################################################
-    #cat("\nCreate folder cluster")
-    FolderCluster = paste(FolderSplit, "/Cluster", sep="")
-    if(dir.exists(FolderCluster)==FALSE){
-      dir.create(FolderCluster)
+    #cat("\nLoad sources and packages")
+    sistema = c(Sys.info())
+    FolderRoot = ""
+    if (sistema[1] == "Linux"){
+      FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
+    } else {
+      FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
+    }
+    FolderScripts = paste(FolderRoot, "/scripts", sep="")
+    
+    setwd(FolderScripts)
+    source("libraries.R")
+    
+    setwd(FolderScripts)
+    source("utils.R")
+    
+    #############################################################################################################
+    # COLORS                                                                                                    #
+    #############################################################################################################
+    n <- 100
+    qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual',]
+    brewer.pal(7,"Greens")
+    col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+    rainbowcols <- rainbow(20)
+    coolBlueHotRed <- function(n, alpha = 1) {
+      rainbow(n, end=4/6, alpha=alpha)[n:1]
+    }
+    colors <- function(n, alpha = 1) {
+      rev(heat.colors(n, alpha))
     }
     
-    cat("\n From 1 to grid")
+    ############################################################################################################
+    #cat("\nCreate Folder Split")
+    FolderSplit = paste(diretorios$folderResultsPartitions, "/Split-", f, sep="")
+    if(dir.exists(FolderSplit)==FALSE){
+      dir.create(FolderSplit)
+    }
+    
+    ############################################################################################################
+    #cat("\nCreate folder Graphic")
+    FolderGraphic = paste(FolderSplit, "/Graphics", sep="")
+    if(dir.exists(FolderGraphic)==FALSE){
+      dir.create(FolderGraphic)
+    }
+    
+    ############################################################################################################
+    #cat("\nCreate folder Graphic")
+    FolderClusters = paste(FolderSplit, "/Clusters", sep="")
+    if(dir.exists(FolderClusters)==FALSE){
+      dir.create(FolderClusters)
+    }
+    
+    ############################################################################################################
+    folderM = paste(diretorios$folderResultsKohonen, "/Split-",f, "/Model", sep="")
+
+    ############################################################################################################    
+    cat("\nObtain the codebooks vector from model supersom")
+    setwd(folderM)
+    model = readRDS(paste("fold-", f, "-superSom.rds", sep=""))
+    codes = data.frame(read.csv(paste("fold-",f,"-code.csv", sep="")))
+    codes2 = codes[,-1]
     
     if(interactive()==TRUE){ flush.console() }
     
+    apagar = c(0)
+    neurons = c(seq(from=1, to=ds$gridn, by=1))
+    AllPartitions = data.frame(apagar, neurons)
+    
+    ############################################################################
+    # START CUT THE KOHONEN WITH HCLUST                                        #
+    ############################################################################
+    cat("\n From 1 to grid")
     z = 1
+    t = z+2
     for(z in 1:ds$gridn){
       
-      #cat("\nHierarchical Clustering to Group Codebooks")
-      som_cluster <- cutree(hclust(dist(codes)), z)
+      cat("\nHierarchical Clustering to Group Codebooks")
+      som_cluster <- cutree(hclust(dist(codes2)), z)
+      a = c(som_cluster)
+      
       #print(som_cluster)
       #arquivo = paste("fold-", f, "-cluster-", z, ".csv", sep="")
       #d<-lapply(som_cluster, write, file= arquivo, append=T);
-      
-      a = c(som_cluster)
-      
-      setwd(FolderCluster)
       #write(paste("fold-", f, "-clusters", sep=""), arquivo)
+      
+      setwd(FolderClusters)
       write.csv(a, paste("fold-", f, "-clusters-", z, ".csv", sep=""))
       
-      #cat("\nClusters Mapping")
+      p = a
+      AllPartitions = cbind(AllPartitions, p)
+      names(AllPartitions)[t] = paste("partition-", z, sep="")
+      
+      cat("\nClusters Mapping")
       setwd(FolderGraphic)
       pdf(paste("fold-", f, "-cluster-", z, "-mapping.pdf", sep = ""), width = 10, height = 8)
       plot(model, type="mapping", bgcol = col_vector[som_cluster]) 
-      #add.cluster.boundaries(model, som_cluster)
+      add.cluster.boundaries(model, som_cluster)
       print(plot)
       dev.off()
       cat("\n")
       
-      #cat("\nClusters Segments")
+      cat("\nClusters Segments")
       setwd(FolderGraphic)
       pdf(paste("fold-", f, "-cluster-", z, "-segments.pdf", sep = ""), width = 10, height = 8)
       plot(model, type="codes", codeRendering = "segments", bgcol = col_vector[som_cluster]) 
-      #add.cluster.boundaries(model, som_cluster)
+      add.cluster.boundaries(model, som_cluster)
       print(plot)
       dev.off()
       cat("\n")
+      
+      z = z + 1
+      t = t + 1
       
       if(interactive()==TRUE){ flush.console() }
       gc()
     }
+    ############################################################################
+    # END CUT THE KOHONEN WITH HCLUST                                          #
+    ############################################################################
+    
+    setwd(FolderSplit)
+    AllPartitions2 = AllPartitions[,-1]
+    write.csv(AllPartitions2, paste("fold-", f,"-AllClusters.csv", sep=""), row.names = FALSE)
     
     if(interactive()==TRUE){ flush.console() }
     gc()
-  }
+  } 
   
   if(interactive()==TRUE){ flush.console() }
   gc()
+  
   cat("\n##################################################################################################")
-  cat("\n# END COMPUTE KOHONEN                                                                            #")
+  cat("\n# END PARTITIONING THE LABEL SPACE ACCORDINGLY WITH LABEL CORRELATIONS                           #")
   cat("\n##################################################################################################")
   cat("\n\n\n\n")
 }
@@ -344,28 +446,34 @@ joinWinnersInstances <- function(resLS, folderResults){
   
   cat("\nFrom 1 to 10 folds!")
   f = 1
-  joinParalel <- foreach(f = 1:number_folds) %dopar%{
+  jwiParalel <- foreach(f = 1:number_folds) %dopar%{
   
     ############################################################################################################
     FolderSplit = paste(diretorios$folderResultsKohonen, "/Split-", f, sep="")
     FolderM = paste(FolderSplit, "/Model", sep="")
-    
+
+    ############################################################################################################    
     # Open the file with the winners neurons
     setwd(FolderM)
     winners = read.csv(paste("fold-",f,"-unit.csv", sep=""))
     
+    ############################################################################################################    
     # Transform csv in Data Frame
     winners = data.frame(winners)
-    
+
+    ############################################################################################################        
     # changing the names of columns
     names(winners) = c("Instances", "WinnerNeuron")
-    
+
+    ############################################################################################################        
     # Joint the two files: winners neurons and class space
     winners2 = cbind(winners, resLS$Classes[f])
     
+    ############################################################################################################    
     # Save the join information
     setwd(FolderSplit)
     write.csv(winners2, paste("fold-", f, "-winners.csv", sep=""), row.names = FALSE)
+    #saveRDS(winners2, paste("fold-", f, "-winners.rds", sep=""))
   
     if(interactive()==TRUE){ flush.console() }
     gc()
@@ -374,6 +482,7 @@ joinWinnersInstances <- function(resLS, folderResults){
   
   if(interactive()==TRUE){ flush.console() }
   gc()
+  
   cat("\n##################################################################################################")
   cat("\n# END JOIN WINNER NEURONS INSTANCES                                                              #")
   cat("\n##################################################################################################")
@@ -443,7 +552,7 @@ instancesPerNeurons <- function(ds, folderResults){
     } # fim do grupo/partição
     
     setwd(FolderSplit)
-    nome = paste("fold-", f, "-ipn-percentagem.csv", sep="")
+    nome = paste("fold-", f, "-instancesPerNeurons.csv", sep="")
     write.csv(totalInstanciasPorneuron[-1,], nome, row.names = F)
     
     if(interactive()==TRUE){ flush.console() }
@@ -583,18 +692,14 @@ selectExclusivesLabels <- function(ds, namesLabels, folderResults){
     namesLabels = namesLabels
     
     ############################################################################################################
-    cat("\nGet folders")
-    FolderSplit = paste(diretorios$folderResultsKohonen, "/Split-", f, sep="")
-    FolderCluster = paste(FolderSplit, "/Cluster", sep="")
-    FolderIPN = paste(FolderSplit, "/InstancesPerNeurons", sep="")
+    #cat("\nGet folders")
+    FolderKohonenSplit = paste(diretorios$folderResultsKohonen, "/Split-", f, sep="")
+    FolderPartitionsSplit = paste(diretorios$folderResultsPartitions, "/Split-", f, sep="")
+    FolderPartitionsSplitClusters = paste(FolderPartitionsSplit, "/Clusters", sep="")
     
-    FolderAllPartitions = paste(FolderSplit, "/Partitions", sep="")
-    if(dir.exists(FolderAllPartitions)==FALSE){
-      dir.create(FolderAllPartitions)
-    }
-    
+    ############################################################################################################
     #cat("\nOpen Label per Neurons")
-    setwd(FolderSplit)
+    setwd(FolderKohonenSplit)
     lpn = data.frame(read.csv(paste("fold-",f,"-labelsPerNeuron.csv", sep="")))
     names(lpn)[1] = "label"
     lpn2 = data.frame(t(lpn))
@@ -603,9 +708,10 @@ selectExclusivesLabels <- function(ds, namesLabels, folderResults){
     lpn2a = as.data.frame(apply(lpn2,2,as.numeric))
     
     #sapply(lpn2, class)
-    
+
+    ############################################################################################################    
     #cat("\nOpen Label per Neurons Binary")
-    setwd(FolderSplit)
+    setwd(FolderKohonenSplit)
     lpn_b = data.frame(read.csv(paste("fold-",f,"-labelsPerNeuron-binary.csv", sep="")))
     names(lpn_b)[1] = "label"
     lpn3 = data.frame(t(lpn_b))
@@ -614,9 +720,11 @@ selectExclusivesLabels <- function(ds, namesLabels, folderResults){
     rownames(lpn3) = NULL
     lpn3a = as.data.frame(apply(lpn3,2,as.numeric))
     
+    ############################################################################################################
     # número de partições
     num.part = ds$gridn - 1
-    
+
+    ############################################################################################################    
     cat("\nFrom partition 2 to grid")
     k = 2
     while(k<=num.part){
@@ -627,13 +735,13 @@ selectExclusivesLabels <- function(ds, namesLabels, folderResults){
       final = data.frame()
       
       #cat("\nGet Folders")
-      FolderPartition = paste(FolderAllPartitions, "/Partition-", k, sep="")
-      if(dir.exists(FolderPartition)==FALSE){
-        dir.create(FolderPartition)
+      FolderPSP = paste(FolderPartitionsSplit, "/Partition-", k, sep="")
+      if(dir.exists(FolderPSP)==FALSE){
+        dir.create(FolderPSP)
       }
       
       #cat("\nOpen info clusters")
-      setwd(FolderCluster)
+      setwd(FolderPartitionsSplitClusters)
       name2 = paste("fold-",f,"-clusters-",k,".csv", sep="")
       cluster = data.frame(read.csv(name2))
       names(cluster) = c("neuron","cluster")
@@ -657,9 +765,9 @@ selectExclusivesLabels <- function(ds, namesLabels, folderResults){
       #print(ncl_b)
       
       #cat("\nSave all information: clusters, fold, partitions, groups, winners neuros, number instance, labels")
-      setwd(FolderPartition)
+      setwd(FolderPSP)
       write.csv(ncl_t, paste("fold-", f, "-original-partition-", k, ".csv", sep=""), row.names = FALSE)
-      write.csv(ncl_b, paste("fold-", f, "-original-partition-", k, "-binary.csv", sep=""), row.names = FALSE)
+      #write.csv(ncl_b, paste("fold-", f, "-original-partition-", k, "-binary.csv", sep=""), row.names = FALSE)
       
       #cat("\nFinal data frame")
       ncl_final = rbind(ncl_final, ncl_t)
@@ -705,9 +813,10 @@ selectExclusivesLabels <- function(ds, namesLabels, folderResults){
       } # fim do grupo
       
       # salva as informações
-      setwd(FolderPartition)
-      write.csv(sumario_t, paste("original-total-labels-groups-", k, ".csv", sep=""), row.names = FALSE)
-      write.csv(sumario_b, paste("original-total-neurons-labels-groups-", k, ".csv", sep=""), row.names = FALSE)
+      setwd(FolderPSP)
+      write.csv(sumario_t, paste("fold-", f, "-original-total-labels-groups-", k, ".csv", sep=""), row.names = FALSE)
+      write.csv(sumario_b, paste("fold-", f,"-original-total-neurons-labels-groups-", k, ".csv", sep=""), row.names = FALSE)
+      
       sumario_b2 = ifelse((sumario_b!=0),1,0)
       
       #convert into matrix
@@ -737,13 +846,14 @@ selectExclusivesLabels <- function(ds, namesLabels, folderResults){
       
       # salva informações
       final_partition = cbind(namesLabels, data.frame(sum_mtb))
-      setwd(FolderPartition)
+      setwd(FolderPSP)
       write.csv(final_partition, paste("fold-", f, "-selected-partition-", k, ".csv", sep=""), row.names = FALSE)
       
       #barplot(sum_mtb, ylab= "Total", beside=TRUE, col=rainbow(5))
       #legend("topright", c(namesLabels), cex=0.6, bty="n", fill=rainbow(5));
       
       k = k + 1
+      
       if(interactive()==TRUE){ flush.console() }
       gc()
     } # fim da partição
@@ -782,12 +892,6 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
   #cat("\nGet directories")
   diretorios = directories(dataset_name, folderResults)
   
-  # /dev/shm/res/birds/InfoPartitions
-  FolderInfoPart = paste(diretorios$folderResultsDataset, "/InfoPartitions", sep="")
-  if(dir.exists(FolderInfoPart)==FALSE){
-    dir.create(FolderInfoPart)
-  }
-
   cat("\nFrom 1 to 10 folds!")
   f = 1
   vgpParalel <- foreach(f = 1:number_folds) %dopar%{
@@ -795,18 +899,12 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
     cat("\nFold: ", f)
     
     ############################################################################################################
-    # aqui é onde está as informações das atuais partições
-    # /dev/shm/res/birds/Kohonen/Split-1
-    FolderSplit = paste(diretorios$folderResultsKohonen, "/Split-", f, sep="")
-    # /dev/shm/res/birds/Kohonen/Split-1/Partitions
-    FolderAllPartitions = paste(FolderSplit, "/Partitions", sep="")
+    FolderSplit = paste(diretorios$folderResultsPartitions, "/Split-", f, sep="")
     
     ############################################################################################################
-    # onde salvarei as informações das novas partições
-    # /dev/shm/res/birds/InfoPartitions/Split-1
-    FolderIPSplit = paste(FolderInfoPart, "/Split-", f, sep="")
-    if(dir.exists(FolderIPSplit)==FALSE){
-      dir.create(FolderIPSplit)
+    FolderOutPutSplit = paste(diretorios$folderOutputDataset, "/Split-", f, sep="")
+    if(dir.exists(FolderOutPutSplit)==FALSE){
+      dir.create(FolderOutPutSplit)
     }
     
     ############################################################################################################
@@ -826,15 +924,14 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
     while(p<=num.part){
       cat("\n\tPartition: ", p)
       
-      # pasta para guardar as novas informações das partições
-      # /dev/shm/res/birds/InfoPartitions/Split-1/Partition-2
-      FolderIPSP = paste(FolderIPSplit, "/Partition-", p, sep="")
-      if(dir.exists(FolderIPSP)==FALSE){
-        dir.create(FolderIPSP)
+      FolderOutPutPartition = paste(FolderOutPutSplit, "/Partition-", p, sep="")
+      if(dir.exists(FolderOutPutPartition)==FALSE){
+        dir.create(FolderOutPutPartition)
       }
       
-      # pegando informações da partição atual
-      FolderPartition = paste(FolderAllPartitions, "/Partition-", p, sep="")
+      ############################################################################################################
+      FolderPartition = paste(FolderSplit, "/Partition-", p, sep="")
+      
       setwd(FolderPartition)
       partition = data.frame(read.csv(paste("fold-",f,"-selected-partition-",p,".csv", sep="")))
       
@@ -856,19 +953,13 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
         names(rotulosPorGrupo) = "totalLabels"
       }
       
-      # salva em "/dev/shm/res/birds/Kohonen/Split-1/Partitions/Partition-2"
-      setwd(FolderPartition)
-      write.csv(rotulosPorGrupo, paste("fold-",f,"-new-labels-per-group-partition-", p,".csv", sep=""))
+      setwd(FolderOutPutPartition)
+      write.csv(rotulosPorGrupo, paste("fold-",f,"-labels-per-group-partition-", p,".csv", sep=""))
         
       # cat("\nData frame")
       fold = f
       partition = p
       resumePartitions = rbind(resumePartitions, data.frame(fold, partition, new.num.groups))
-      resumePartitions2 = resumePartitions[-1,]
-      
-      # salva em "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
-      setwd(FolderIPSP)
-      write.csv(resumePartitions2, paste("fold-",f,"-new-summary-partitions.csv", sep=""), row.names = FALSE)
       
       # pegando os nomes dos rótulos
       nomesDosRotulos = partition3[,1]
@@ -886,8 +977,7 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
       group2 = c(0)
       labels2 = ("")
       particao = data.frame(group2, labels2) 
-      
-      # 
+       
       y = 1
       w = y + 1
       while(y<=new.num.groups){
@@ -908,12 +998,8 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
           labels2 = namesLabels
           particao = rbind(particao, data.frame(group2, labels2))
           
-          # salva em "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
-          setwd(FolderIPSP)
-          write.csv(namesLabels, paste("labels-in-this-group-", y, "-.csv", sep=""))
-          
-          #setwd(FolderPartition)
-          #write.csv(namesLabels, paste("labels-in-this-group-", y, "-.csv", sep="")) 
+          #setwd(FolderOutPutPartition)
+          #write.csv(namesLabels, paste("labels-in-group-", y, ".csv", sep=""))
           
         } else {
           #cat("\n\tAlguns rótulos fazem parte deste grupo")
@@ -929,12 +1015,9 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
           group = nomesGrupos[w]
           labelsPerGroups2 = rbind(labelsPerGroups2, data.frame(group, totalLabelsGroup))
           
-          # "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
-          setwd(FolderIPSP)
-          write.csv(rotulosNesteGrupo, paste("labels-in-this-group-", y, "-.csv", sep=""))
+          #setwd(FolderOutPutPartition)
+          #write.csv(rotulosNesteGrupo, paste("labels-in-group-", y, ".csv", sep=""))
           
-          #setwd(FolderPartition)
-          #write.csv(rotulosNesteGrupo, paste("labels-in-this-group-", y, "-.csv", sep="")) 
         }
         
         w = w + 1
@@ -944,28 +1027,32 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
       
       labelsPerGroups2 = labelsPerGroups2[-1,]
       particao2 = particao[-1,]
+      names(particao2) = c("group", "label")
       
-      # salva em "/dev/shm/res/birds/Kohonen/Split-1/Partitions/Partition-2"
-      setwd(FolderPartition)
-      write.csv(labelsPerGroups2, paste("total-labels-per-groups-partition-", p, "-.csv", sep=""))
-      write.csv(particao2, paste("new-final-partition-", p, "-.csv", sep=""))
-      
-      # salva em "/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
-      setwd(FolderIPSP)
-      write.csv(labelsPerGroups2, paste("total-labels-per-groups-partition-", p, "-.csv", sep=""))
-      write.csv(particao2, paste("new-final-partition-", p, "-.csv", sep=""))
+      setwd(FolderOutPutPartition)
+      write.csv(particao2, paste("partition-", p, ".csv", sep=""), row.names = FALSE)
       
       p = p + 1 # increment partition
+      
       if(interactive()==TRUE){ flush.console() }
+      
       gc()
+      
     } # fim partition
+    
+    setwd(FolderOutPutSplit)
+    resumePartitions2 = resumePartitions[-1,]
+    names(resumePartitions2)[3] = "num.groups"
+    write.csv(resumePartitions2, paste("fold-",f,"-groups-per-partition.csv", sep=""), row.names = FALSE)
     
     if(interactive()==TRUE){ flush.console() }
     gc()
+    
   } # fim fold
   
   if(interactive()==TRUE){ flush.console() }
   gc()
+  
   cat("\n##################################################################################################")
   cat("\n# END VERIFY EMPTY GROUPS                                                                        #")
   cat("\n##################################################################################################")
@@ -988,44 +1075,50 @@ generatedPartitionsKohonen <- function(ds, resLS, namesLabels, number_dataset, n
   diretorios = directories(dataset_name, folderResults)
   
   cat("\n\n################################################################################################")
-  cat("\n#Run: Compute kohonen")
-  timeKohonen = system.time(computeKohonen(ds, resLS, number_dataset, number_cores, number_folds, folderResults))
-  cat("\n\n################################################################################################")
+  cat("\n# Run: Modeling Label Correlations                                                               #")
+  timeMLC = system.time(modelingLabelCorrelations(ds, resLS, number_dataset, number_cores, number_folds, folderResults))
+  cat("\n\n################################################################################################\n\n")
   
   cat("\n\n################################################################################################")
-  cat("\n#Run:Join instances with winners                                                                  #")
+  cat("\n# Run: Partitioning the Label Space                                                              #")
+  timePLS = system.time(partitioningLabelSpace(ds, resLS, number_dataset, number_cores, number_folds, folderResults))
+  cat("\n\n################################################################################################\n\n")
+  
+  cat("\n\n################################################################################################")
+  cat("\n# Run: Join instances with winners                                                               #")
   timeJoin = system.time(joinWinnersInstances(resLS, folderResults))
-  cat("\n\n################################################################################################")
+  cat("\n\n################################################################################################\n\n")
   
   cat("\n\n################################################################################################")
-  cat("\n#Run: Calculate labels per neurons                                                                #")
+  cat("\n# Run: Calculate labels per neurons                                                              #")
   timeLPN = system.time(labelsPerNeurons(ds, folderResults))
-  cat("\n\n################################################################################################")
+  cat("\n\n################################################################################################\n\n")
   
   cat("\n\n################################################################################################")
-  cat("\n#Run: Calculate instances per neurons                                                             #")
+  cat("\n# Run: Calculate instances per neurons                                                           #")
   timeIPN = system.time(instancesPerNeurons(ds, folderResults))
-  cat("\n\n################################################################################################")
+  cat("\n\n################################################################################################\n\n")
   
   cat("\n\n################################################################################################")
-  cat("\n#Run: Verify Exclusive Labels                                                                     #")
+  cat("\n# Run: Verify Exclusive Labels                                                                   #")
   timeSEL = system.time(selectExclusivesLabels(ds, namesLabels, folderResults)) 
-  cat("\n\n################################################################################################")
+  cat("\n\n################################################################################################\n\n")
   
   cat("\n\n################################################################################################")
-  cat("\n#Run: Verify Empty Groups                                                                         #")
+  cat("\n# Run: Verify Empty Groups                                                                       #")
   timeVGE = system.time(verifyGroupsEmpty(ds, namesLabels, folderResults)) 
-  cat("\n\n################################################################################################")
+  cat("\n\n################################################################################################\n\n")
   
   cat("\n\n################################################################################################")
-  cat("\n#Runtime")
-  timesKohonen = rbind(timeKohonen, timeJoin, timeLPN, timeSEL, timeVGE)
-  setwd(diretorios$folderResultsKohonen)
-  write.csv(timesKohonen, paste(dataset_name, "-kohonen-RunTime.csv"))
-  cat("\n##################################################################################################")
+  cat("\n# Runtime                                                                                        #")
+  timesKohonen = rbind(timeMLC, timePLS, timeJoin, timeLPN, timeIPN, timeSEL, timeVGE)
+  setwd(diretorios$folderDatasetResults)
+  write.csv(timesKohonen, paste(dataset_name, "-generatedPartitionsKohonen-RunTime.csv"))
+  cat("\n##################################################################################################\n\n")
 
   if(interactive()==TRUE){ flush.console() }
   gc()
+  
   cat("\n##################################################################################################")
   cat("\n# END GENERATED PARTITIONS KOHONEN                                                               #")
   cat("\n##################################################################################################")

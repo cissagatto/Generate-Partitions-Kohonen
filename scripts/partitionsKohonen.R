@@ -2,9 +2,8 @@ cat("\n\n#######################################################################
 cat("\n# START GENERATING PARTITIONS KOHONEN                                                            #")
 cat("\n##################################################################################################\n\n") 
 
-
 ##################################################################################################
-
+# Modeling Labels Correlations with Kohonen and Partitioning the Label Space With HClust         #
 # Copyright (C) 2021                                                                             #
 #                                                                                                #
 # This code is free software: you can redistribute it and/or modify it under the terms of the    #
@@ -32,14 +31,11 @@ cat("\n#########################################################################
 # Configures the workspace according to the operating system                                     #
 ##################################################################################################
 sistema = c(Sys.info())
-shm = 0
 FolderRoot = ""
 if (sistema[1] == "Linux"){
-  shm = 1
-  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 } else {
-  shm = 0
-  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 }
 FolderScripts = paste(FolderRoot, "/scripts", sep="")
 
@@ -48,22 +44,28 @@ FolderScripts = paste(FolderRoot, "/scripts", sep="")
 ##################################################################################################
 # Options Configuration                                                                          #
 ##################################################################################################
+cat("\nR options config")
 options(java.parameters = "-Xmx32g")
 options(show.error.messages = TRUE)
 options(scipen=30)
 
 
-##################################################################################################
-# ARGS COMMAND LINE                                                                              #
-##################################################################################################
-args <- commandArgs(TRUE)
-
 
 ##################################################################################################
 # Read the dataset file with the information for each dataset                                    #
 ##################################################################################################
+cat("\nOpen datasets")
 setwd(FolderRoot)
 datasets <- data.frame(read.csv("datasets-hpml-k.csv"))
+
+
+
+##################################################################################################
+# ARGS COMMAND LINE                                                                              #
+##################################################################################################
+cat("\nGet Args")
+args <- commandArgs(TRUE)
+
 
 
 ##################################################################################################
@@ -72,8 +74,6 @@ datasets <- data.frame(read.csv("datasets-hpml-k.csv"))
 ds <- datasets[as.numeric(args[1]),]
 cat("\nHPML-K DS \t ", as.numeric(args[1]))
 
-#ds <- datasets[2,]
-#number_dataset = 2
 
 
 ##################################################################################################
@@ -83,11 +83,13 @@ number_cores <- as.numeric(args[2])
 cat("\nHPML-K: cores \t ", number_cores)
 
 
+
 ##################################################################################################
 # Get the number of folds                                                                        #
 ##################################################################################################
 number_folds <- as.numeric(args[3])
 cat("\nHPML-K: folds \t ", number_folds)
+
 
 
 ##################################################################################################
@@ -97,6 +99,7 @@ folderResults <- toString(args[4])
 cat("\nHPML-K: folder \t ", folderResults)
 
 
+
 ##################################################################################################
 # Get dataset name                                                                               #
 ##################################################################################################
@@ -104,31 +107,56 @@ dataset_name <- toString(ds$Name)
 cat("\nHPML-K: nome \t ", dataset_name)
 
 
+
+##################################################################################################
+# DON'T RUN -- it's only for test the code
+# ds = datasets[2,]
+# dataset_name = ds$Name
+# number_dataset = ds$Id
+# number_cores = 10
+# number_folds = 10
+# folderResults = "/dev/shm/birds"
+##################################################################################################
+
+
+
 ##################################################################################################
 # CONFIG THE FOLDER RESULTS                                                                      #
 ##################################################################################################
+cat("\nCreate Folder")
 if(dir.exists(folderResults)==FALSE){
   dir.create(folderResults)
 }
 
 
+
 ##################################################################################################
 # LOAD RUN.R                                                                                     #
 ##################################################################################################
+cat("\nLoad sources")
 setwd(FolderScripts)
 source("run.R") 
+
+
+
+##################################################################################################
+#
+##################################################################################################
+cat("\nGet directories")
+diretorios = directories(dataset_name, folderResults)
+
 
 
 ##################################################################################################
 # execute the code and get the total execution time                                              #
 # n_dataset, number_cores, number_folds, folderResults                                           #
 ##################################################################################################
-diretorios = directories(dataset_name, folderResults)
-
+cat("\nExecute GPKH")
 timeFinal <- system.time(results <- gpkh(args[1], number_cores, number_folds, folderResults))
 print(timeFinal)
 
-#timeFinal <- system.time(results <- gpkh(2, number_cores, number_folds, folderResults))
+# DO NOT RUN
+# timeFinal <- system.time(results <- gpkh(2, number_cores, number_folds, folderResults))
 
 
 ##################################################################################################
@@ -139,6 +167,7 @@ str0 <- paste(diretorios$folderResults, "/", dataset_name, "-results-gpkh.rds", 
 save(results, file = str0)
 
 
+
 ##################################################################################################
 # save results in RDATA form in the dataset folder                                               #
 ##################################################################################################
@@ -147,20 +176,14 @@ str1 <- paste(diretorios$folderResults, "/", dataset_name, "-results-gpkh.RData"
 save(results, file = str1)
 
 
+
 ##################################################################################################
 # compress the results for later transfer to the dataset folder                                  #
 ##################################################################################################
-#"/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
 cat("\nCompress results \n")
-setwd(diretorios$folderResultsInfoPar)
-str = paste("tar -zcvf ", dataset_name, "-info-partitions.tar.gz ", diretorios$folderResultsInfoPar, sep="")
+setwd(diretorios$folderResults)
+str = paste("tar -zcvf ", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderResults, sep="")
 print(system(str))
-
-#"/dev/shm/res/birds/InfoPartitions/Split-1/Partition-2"
-cat("\nCompress results \n")
-setwd(diretorios$folderResultsKohonen)
-str1 = paste("tar -zcvf ", dataset_name, "-kohonen.tar.gz ", diretorios$folderResultsKohonen, sep="")
-print(system(str1))
 
 
 
@@ -168,21 +191,17 @@ print(system(str1))
 # copy file                                                                                      #
 ##################################################################################################
 cat("\nCopy file tar \n")
-str2 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-info-partitions.tar.gz ", diretorios$folderReportsDataset, sep="")
+str2 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderDatasetResults, sep="")
 print(system(str2))
 
-cat("\nCopy file tar \n")
-str3 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-info-kohonen.tar.gz ", diretorios$folderReportsDataset, sep="")
-print(system(str3))
 
 
 ########################################################################################################################
-#cat("\n Copy to google drive")
-#origem = paste(diretorios$FolderReports, "/", dataset_name, "-results.tar.gz", sep="")
-#destino = paste("cloud:elaine/RandomPartitions1/", dataset_name, sep="")
-#comando = paste("rclone copy ", origem, " ", destino, sep="")
-#system(comando)
-
+cat("\n Copy to google drive")
+origem = diretorios$folderDatasetResults
+destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen-HClust/", dataset_name, sep="")
+comando = paste("rclone -v copy ", origem, " ", destino, sep="")
+system(comando)
 
 ##################################################################################################
 # del                                                                                      #
@@ -191,8 +210,10 @@ cat("\nDelete folder \n")
 str5 = paste("rm -r ", diretorios$folderResults, sep="")
 print(system(str5))
 
+cat("\nDel objects")
 rm(list = ls())
 
+cat("\nClear!")
 gc()
 
 cat("\n##################################################################################################")

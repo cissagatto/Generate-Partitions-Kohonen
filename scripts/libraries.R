@@ -1,5 +1,5 @@
 ##################################################################################################
-
+# Modeling Labels Correlations with Kohonen and Partitioning the Label Space With HClust         #
 # Copyright (C) 2021                                                                             #
 #                                                                                                #
 # This code is free software: you can redistribute it and/or modify it under the terms of the    #
@@ -25,20 +25,17 @@
 # Configures the workspace according to the operating system                                     #
 ##################################################################################################
 sistema = c(Sys.info())
-shm = 0
 FolderRoot = ""
 if (sistema[1] == "Linux"){
-  shm = 1
-  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 } else {
-  shm = 0
-  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 }
 FolderScripts = paste(FolderRoot, "/scripts", sep="")
 
 
 ##################################################################################################
-# Load Packages                                                                                  #
+# Load R Packages                                                                                #
 ##################################################################################################
 
 library("readr", quietly = TRUE)

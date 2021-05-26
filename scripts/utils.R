@@ -1,5 +1,5 @@
 ##################################################################################################
-
+# Modeling Labels Correlations with Kohonen and Partitioning the Label Space With HClust         #
 # Copyright (C) 2021                                                                             #
 #                                                                                                #
 # This code is free software: you can redistribute it and/or modify it under the terms of the    #
@@ -17,34 +17,33 @@
 #                                                                                                #
 ##################################################################################################
 
+
 ##################################################################################################
 # Script 2 - Utils                                                                               #
 ##################################################################################################
+
 
 ##################################################################################################
 # Configures the workspace according to the operating system                                     #
 ##################################################################################################
 sistema = c(Sys.info())
-shm = 0
 FolderRoot = ""
 if (sistema[1] == "Linux"){
-  shm = 1
-  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("/home/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 } else {
-  shm = 0
-  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen-HClust", sep="")
+  FolderRoot = paste("C:/Users/", sistema[7], "/Generate-Partitions-Kohonen", sep="")
 }
 FolderScripts = paste(FolderRoot, "/scripts", sep="")
-
 
 
 ##################################################################################################
 # FUNCTION DIRECTORIES                                                                           #
 #   Objective:                                                                                   #
-#      Creates all the necessary folders for the project. These are the main folders that must   # 
-#      be created and used before the script starts to run                                       #  
+#      Creates all the necessary folders for the project.                                        #  
 #   Parameters:                                                                                  #
-#      None                                                                                      #
+#      dataset_name: name of the dataset                                                         #
+#      folderResults: path to save process the algorithm. Example: "/dev/shm/birds",             # 
+#                     "/scratch/birds", "/home/usuario/birds", "/C:/Users/usuario/birds"         #
 #   Return:                                                                                      #
 #      All path directories                                                                      #
 ##################################################################################################
@@ -52,6 +51,12 @@ directories <- function(dataset_name, folderResults){
   
   retorno = list()
   
+  #############################################################################
+  # RESULTS FOLDER:                                                           #
+  # Parameter from command line. This folder will be delete at the end of the #
+  # execution. Other folder is used to store definitely the results.          #
+  # Example: "/dev/shm/res"                                                   #
+  #############################################################################
   if(dir.exists(folderResults) == TRUE){
     setwd(folderResults)
     dir_folderResults = dir(folderResults)
@@ -63,6 +68,14 @@ directories <- function(dataset_name, folderResults){
     n_folderResults = length(dir_folderResults)
   }
   
+  
+  #############################################################################
+  # UTILS FOLDER:                                                             #
+  # Get information about the files within folder utils that already exists   #
+  # in the project. It's needed to run CLUS framework and convert CSV files   #
+  # in ARFF files correctly.                                                  #
+  # "/home/[user]/Partitions-Kohonen/utils"                                   #
+  #############################################################################
   folderUtils = paste(FolderRoot, "/utils", sep="")
   if(dir.exists(folderUtils) == TRUE){
     setwd(folderUtils)
@@ -75,6 +88,15 @@ directories <- function(dataset_name, folderResults){
     n_folderUtils = length(dir_folderUtils)
   }
   
+  
+  #############################################################################
+  # DATASETS FOLDER:                                                          #
+  # Get the information within DATASETS folder that already exists in the     #
+  # project. This folder store the files from cross-validation and will be    #
+  # use to get the label space to modeling the label correlations and         #
+  # compute silhouete to choose the best hybrid partition.                    #
+  # "/home/[user]/Partitions-Kohonen/datasets"                                #
+  #############################################################################
   folderDatasets = paste(FolderRoot, "/datasets", sep="")
   if(dir.exists(folderDatasets) == TRUE){
     setwd(folderDatasets)
@@ -87,19 +109,35 @@ directories <- function(dataset_name, folderResults){
     n_folderDatasets = length(dir_folderDatasets)
   }
   
-  folderDatasetX = paste(folderDatasets, "/", dataset_name, sep="")
-  if(dir.exists(folderDatasetX) == TRUE){
-    setwd(folderDatasetX)
-    dir_folderDatasetX = dir(folderDatasetX)
-    n_folderDatasetX = length(dir_folderDatasetX)
+  
+  #############################################################################
+  # SPECIFIC DATASET FOLDER:                                                  #
+  # Path to the specific dataset that is runing. Example: with you are        # 
+  # running this code for EMOTIONS dataset, then this get the path from it    #
+  # "/home/[user]/Partitions-Kohonen/datasets/birds"                          #
+  #############################################################################
+  folderSpecificDataset = paste(folderDatasets, "/", dataset_name, sep="")
+  if(dir.exists(folderSpecificDataset) == TRUE){
+    setwd(folderSpecificDataset)
+    dir_folderSpecificDataset = dir(folderSpecificDataset)
+    n_folderSpecificDataset = length(dir_folderSpecificDataset)
   } else {
-    dir.create(folderDatasetX)
-    setwd(folderDatasetX)
-    dir_folderDatasetX = dir(folderDatasetX)
-    n_folderDatasetX = length(dir_folderDatasetX)
+    dir.create(folderSpecificDataset)
+    setwd(folderSpecificDataset)
+    dir_folderSpecificDataset = dir(folderSpecificDataset)
+    n_folderSpecificDataset = length(dir_folderSpecificDataset)
   }
   
-  folderLabelSpace = paste(folderDatasetX, "/LabelSpace", sep="")
+  
+  #############################################################################
+  # LABEL SPACE FOLDER:                                                       #
+  # Path to the specific label space from the dataset that is runing.         #
+  # This folder store the label space for each FOLD from the cross-validation #
+  # which was computed in the Cross-Validation Multi-Label code.              #
+  # In this way, we don't need to load the entire dataset into the running    #
+  # "/home/elaine/Partitions-Kohonen/datasets/birds/LabelSpace"               #
+  #############################################################################
+  folderLabelSpace = paste(folderSpecificDataset, "/LabelSpace", sep="")
   if(dir.exists(folderLabelSpace) == TRUE){
     setwd(folderLabelSpace)
     dir_folderLabelSpace = dir(folderLabelSpace)
@@ -111,7 +149,15 @@ directories <- function(dataset_name, folderResults){
     n_folderLabelSpace = length(dir_folderLabelSpace)
   }
   
-  folderNamesLabels = paste(folderDatasetX, "/NamesLabels", sep="")
+  
+  #############################################################################
+  # NAMES LABELS FOLDER:                                                      #
+  # Get the names of the labels from this dataset. This will be used in the   #
+  # code to create the groups for each partition. Is a way to guarantee the   #
+  # use of the correct names labels.                                          #
+  # "/home/[user]/Partitions-Kohonen/datasets/birds/NamesLabels"              #
+  #############################################################################
+  folderNamesLabels = paste(folderSpecificDataset, "/NamesLabels", sep="")
   if(dir.exists(folderNamesLabels) == TRUE){
     setwd(folderNamesLabels)
     dir_folderNamesLabels = dir(folderNamesLabels)
@@ -123,7 +169,14 @@ directories <- function(dataset_name, folderResults){
     n_folderLabelSpace = length(dir_folderLabelSpace)
   }
   
-  folderCV = paste(folderDatasetX, "/CrossValidation", sep="")
+  
+  #############################################################################
+  # CROSS VALIDATION FOLDER:                                                  #
+  # Path to the folders and files from cross-validation for the specific      # 
+  # dataset                                                                   #
+  # "/home/[user]/Partitions-Kohonen/datasets/birds/CrossValidation"          #
+  #############################################################################
+  folderCV = paste(folderSpecificDataset, "/CrossValidation", sep="")
   if(dir.exists(folderCV) == TRUE){
     setwd(folderCV)
     dir_folderCV = dir(folderCV)
@@ -135,6 +188,12 @@ directories <- function(dataset_name, folderResults){
     n_folderCV = length(dir_folderCV)
   }
   
+  
+  #############################################################################
+  # TRAIN CROSS VALIDATION FOLDER:                                            #
+  # Path to the train files from cross-validation for the specific dataset    #                                                                   #
+  # "/home/[user]/Partitions-Kohonen/datasets/birds/CrossValidation/Tr"       #
+  #############################################################################
   folderCVTR = paste(folderCV, "/Tr", sep="")
   if(dir.exists(folderCVTR) == TRUE){
     setwd(folderCVTR)
@@ -147,6 +206,12 @@ directories <- function(dataset_name, folderResults){
     n_folderCVTR = length(dir_folderCVTR)
   }
   
+  
+  #############################################################################
+  # TEST CROSS VALIDATION FOLDER:                                             #
+  # Path to the test files from cross-validation for the specific dataset     #                                                                   #
+  # "/home/[user]/Partitions-Kohonen/datasets/birds/CrossValidation/Ts"       #
+  #############################################################################
   folderCVTS = paste(folderCV, "/Ts", sep="")
   if(dir.exists(folderCVTS) == TRUE){
     setwd(folderCVTS)
@@ -159,6 +224,13 @@ directories <- function(dataset_name, folderResults){
     n_folderCVTS = length(dir_folderCVTS)
   }
   
+  
+  #############################################################################
+  # VALIDATION CROSS VALIDATION FOLDER:                                       #
+  # Path to the validation files from cross-validation for the specific       #
+  # dataset                                                                   #                                                           
+  # "/home/[user]/Partitions-Kohonen/datasets/birds/CrossValidation/Vl"       #
+  #############################################################################
   folderCVVL = paste(folderCV, "/Vl", sep="")
   if(dir.exists(folderCVVL) == TRUE){
     setwd(folderCVVL)
@@ -171,6 +243,12 @@ directories <- function(dataset_name, folderResults){
     n_folderCVVL = length(dir_folderCVVL)
   }
   
+  
+  #############################################################################
+  # RESULTS DATASET FOLDER:                                                   #
+  # Path to the results for the specific dataset that is running              #                                                           
+  # "/dev/shm/res/birds"                                                      #
+  #############################################################################
   folderResultsDataset = paste(folderResults, "/", dataset_name, sep="")
   if(dir.exists(folderResultsDataset) == TRUE){
     setwd(folderResultsDataset)
@@ -183,6 +261,12 @@ directories <- function(dataset_name, folderResults){
     n_folderResultsDataset = length(dir_folderResultsDataset)
   }
   
+  
+  #############################################################################
+  # RESULTS KOHONEN FOLDER:                                                   #
+  # Folder to store the results from modeling label correlations with kohonen # 
+  # "/dev/shm/res/birds/Kohonen"                                              #
+  #############################################################################
   folderResultsKohonen = paste(folderResultsDataset, "/Kohonen", sep="")
   if(dir.exists(folderResultsKohonen) == TRUE){
     setwd(folderResultsKohonen)
@@ -195,104 +279,141 @@ directories <- function(dataset_name, folderResults){
     n_folderResultsKohonen = length(dir_folderResultsKohonen)
   }
   
-  folderResultsInfoPart = paste(folderResultsDataset, "/InfoPartitions", sep="")
-  if(dir.exists(folderResultsInfoPart) == TRUE){
-    setwd(folderResultsInfoPart)
-    dir_folderResultsInfoPart = dir(folderResultsInfoPart)
-    n_folderResultsInfoPart = length(dir_folderResultsInfoPart)
+  
+  #############################################################################
+  # RESULTS PARTITIONS FOLDER:                                                #
+  # Folder to store the results from partitioning the label correlations      #
+  # "/dev/shm/res/birds/Partitions"                                           #
+  #############################################################################
+  folderResultsPartitions = paste(folderResultsDataset, "/Partitions", sep="")
+  if(dir.exists(folderResultsPartitions) == TRUE){
+    setwd(folderResultsPartitions)
+    dir_folderResultsPartitions = dir(folderResultsPartitions)
+    n_folderResultsPartitions = length(dir_folderResultsPartitions)
   } else {
-    dir.create(folderResultsInfoPart)
-    setwd(folderResultsInfoPart)
-    dir_folderResultsInfoPart = dir(folderResultsInfoPart)
-    n_folderResultsInfoPart = length(dir_folderResultsInfoPart)
+    dir.create(folderResultsPartitions)
+    setwd(folderResultsPartitions)
+    dir_folderResultsPartitions = dir(folderResultsPartitions)
+    n_folderResultsPartitions = length(dir_folderResultsPartitions)
   }
   
-  folderReports = paste(FolderRoot, "/Reports", sep="")
-  if(dir.exists(folderReports) == TRUE){
-    setwd(folderReports)
-    dir_folderReports = dir(folderReports)
-    n_folderReports = length(dir_folderReports)
+  
+  #############################################################################
+  # DATASET RESULTS FOLDER:                                                   #
+  # Folder to store all results from this code in the ROOT FOLDER             #
+  # The folder RESULTS created before can be anywhere you want, and it will   #
+  # be delete in the end of the execution of this code. So, this folder here  # 
+  # is meant to store definitely the results to be used after to analyse.     # 
+  # "/home/[user]/Partitions-Kohonen/Results"                                 #
+  #############################################################################
+  folderDatasetResults = paste(FolderRoot, "/Results", sep="")
+  if(dir.exists(folderDatasetResults) == TRUE){
+    setwd(folderDatasetResults)
+    dir_folderDatasetResults = dir(folderDatasetResults)
+    n_folderDatasetResults = length(dir_folderDatasetResults)
   } else {
-    dir.create(folderReports)
-    setwd(folderReports)
-    dir_folderReports = dir(folderReports)
-    n_folderReports = length(dir_folderReports)
+    dir.create(folderDatasetResults)
+    setwd(folderDatasetResults)
+    dir_folderDatasetResults = dir(folderDatasetResults)
+    n_folderDatasetResults = length(dir_folderDatasetResults)
   }
   
-  folderReportsDataset = paste(folderReports, "/", dataset_name, sep="")
-  if(dir.exists(folderReportsDataset) == TRUE){
-    setwd(folderReportsDataset)
-    dir_folderReportsDataset = dir(folderReportsDataset)
-    n_folderReportsDataset = length(dir_folderReportsDataset)
+  #############################################################################
+  # OUTPUT FOLDER:                                                            #
+  # This folder is used to store information that will be the INPUT for the   #
+  # next phase of the strategy, i.e., find the best hybrid partition with     #
+  # silhouete measure partitioning or macro-f1 measure performance.           #
+  # Therefore, OUTPUT folder will be used as INPUT folder in next phase.      #
+  # "/home/[user]/Partitions-Kohonen/Output"                                  #
+  #############################################################################
+  folderOutput = paste(FolderRoot, "/Output", sep="")
+  if(dir.exists(folderOutput) == TRUE){
+    setwd(folderOutput)
+    dir_folderOutput = dir(folderOutput)
+    n_folderOutput = length(dir_folderOutput)
   } else {
-    dir.create(folderReportsDataset)
-    setwd(folderReportsDataset)
-    dir_folderReportsDataset = dir(folderReportsDataset)
-    n_folderReportsDataset = length(dir_folderReportsDataset)
+    dir.create(folderOutput)
+    setwd(folderOutput)
+    dir_folderOutput = dir(folderOutput)
+    n_folderOutput = length(dir_folderOutput)
   }
   
-  #folderReportsKohonen = paste(folderReportsDataset, "/Kohonen", sep="")
-  #if(dir.exists(folderReportsKohonen) == TRUE){
-  #  setwd(folderReportsKohonen)
-  #  dir_folderReportsKohonen = dir(folderReportsKohonen)
-  #  n_folderReportsKohonen = length(dir_folderReportsKohonen)
-  #} else {
-  #  dir.create(folderReportsKohonen)
-  #  setwd(folderReportsKohonen)
-  #  dir_folderReportsKohonen = dir(folderReportsKohonen)
-  #  n_folderReportsKohonen = length(dir_folderReportsKohonen)
-  #}
+  #############################################################################
+  # OUTPUT DATASET FOLDER:                                                    #
+  # Folder to the specific dataset                                            #
+  # "/home/[user]/Partitions-Kohonen/Output/birds"                            #
+  #############################################################################
+  folderOutputDataset = paste(folderOutput, "/", dataset_name, sep="")
+  if(dir.exists(folderOutputDataset) == TRUE){
+    setwd(folderOutputDataset)
+    dir_folderOutputDataset = dir(folderOutputDataset)
+    n_folderOutputDataset = length(dir_folderOutputDataset)
+  } else {
+    dir.create(folderOutputDataset)
+    setwd(folderOutputDataset)
+    dir_folderOutputDataset = dir(folderOutputDataset)
+    n_folderOutputDataset = length(dir_folderOutputDataset)
+  }
   
-  # return folders
+  #############################################################################
+  # RETURN ALL PATHS                                                          #
+  #############################################################################
   retorno$folderResults = folderResults
-  retorno$folderResultsDataset = folderResultsDataset
-  retorno$folderResultsKohonen = folderResultsKohonen
-  retorno$folderResultsInfoPar = folderResultsInfoPart
   retorno$folderUtils = folderUtils
   retorno$folderDatasets = folderDatasets
-  retorno$folderDatasetX = folderDatasetX
-  retorno$folderReports = folderReports
-  retorno$folderReportsDataset = folderReportsDataset
-  #retorno$folderReportsKohonen = folderReportsKohonen
-  retorno$folderNamesLabels = folderNamesLabels
+  retorno$folderSpecificDataset = folderSpecificDataset
   retorno$folderLabelSpace = folderLabelSpace
+  retorno$folderNamesLabels = folderNamesLabels
   retorno$folderCV = folderCV
   retorno$folderCVTR = folderCVTR
   retorno$folderCVTS = folderCVTS
   retorno$folderCVVL = folderCVVL
+  retorno$folderResultsKohonen = folderResultsKohonen
+  retorno$folderResultsPartitions = folderResultsPartitions
+  retorno$folderDatasetResults = folderDatasetResults
+  retorno$folderOutput = folderOutput
+  retorno$folderOutputDataset = folderOutputDataset
   
+  
+  #############################################################################
+  # RETURN ALL DIRS                                                           #
+  #############################################################################
   retorno$dir_folderResults = dir_folderResults
-  retorno$dir_folderResultsDataset = dir_folderResultsDataset
-  retorno$dir_folderResultsKohonen = dir_folderResultsKohonen
-  retorno$dir_folderResultsInfoPar = dir_folderResultsInfoPart
   retorno$dir_folderUtils = dir_folderUtils
   retorno$dir_folderDatasets = dir_folderDatasets
-  retorno$dir_folderDatasetX = dir_folderDatasetX
-  retorno$dir_folderReports = dir_folderReports
-  #retorno$dir_folderReportsKohonen = dir_folderReportsKohonen
-  retorno$dir_folderNamesLabels = dir_folderNamesLabels
+  retorno$dir_folderSpecificDataset = dir_folderSpecificDataset
   retorno$dir_folderLabelSpace = dir_folderLabelSpace
+  retorno$dir_folderNamesLabels = dir_folderNamesLabels
   retorno$dir_folderCV = dir_folderCV
   retorno$dir_folderCVTR = dir_folderCVTR
   retorno$dir_folderCVTS = dir_folderCVTS
   retorno$dir_folderCVVL = dir_folderCVVL
+  retorno$dir_folderResultsKohonen = dir_folderResultsKohonen
+  retorno$dir_folderResultsPartitions = dir_folderResultsPartitions
+  retorno$dir_folderDatasetResults = dir_folderDatasetResults
+  retorno$dir_folderOutput = dir_folderOutput
+  retorno$dir_folderOutputDataset = dir_folderOutputDataset
   
+  
+  #############################################################################
+  # RETURN ALL LENGHTS                                                        #
+  #############################################################################
   retorno$n_folderResults = n_folderResults
-  retorno$n_folderResultsDataset = n_folderResultsDataset
-  retorno$n_folderResultsKohonen = n_folderResultsKohonen
-  retorno$n_folderResultsInfoPar = n_folderResultsInfoPart
   retorno$n_folderUtils = n_folderUtils
   retorno$n_folderDatasets = n_folderDatasets
-  retorno$n_folderDatasetX = n_folderDatasetX
-  retorno$n_folderReports = n_folderReports
-  retorno$n_folderReportsDataset = n_folderReportsDataset
-  #retorno$n_folderReportsKohonen = n_folderReportsKohonen
-  retorno$n_folderNamesLabels = n_folderNamesLabels
+  retorno$n_folderSpecificDataset = n_folderSpecificDataset
   retorno$n_folderLabelSpace = n_folderLabelSpace
+  retorno$n_folderNamesLabels = n_folderNamesLabels
   retorno$n_folderCV = n_folderCV
   retorno$n_folderCVTR = n_folderCVTR
   retorno$n_folderCVTS = n_folderCVTS
   retorno$n_folderCVVL = n_folderCVVL
+  retorno$n_folderResultsKohonen = n_folderResultsKohonen
+  retorno$n_folderResultsPartitions = n_folderResultsPartitions
+  retorno$n_folderDatasetResults = n_folderDatasetResults
+  retorno$n_folderOutput = n_folderOutput
+  retorno$n_folderOutputDataset = n_folderOutputDataset
+  
   
   return(retorno)
   gc()
@@ -309,35 +430,54 @@ directories <- function(dataset_name, folderResults){
 #       ds: specific dataset information                                                         #
 #       dataset_name: dataset name. It is used to save files.                                    #
 #       number_folds: number of folds created                                                    #
-#       Folder: folder where the folds are                                                       #
+#       folderResults: folder where to save results                                              #
 #   Return:                                                                                      #
 #       Training set labels space                                                                #
 ##################################################################################################
 labelSpace <- function(ds, dataset_name, number_folds, folderResults){
   
   retorno = list()
+  
+  # return all fold label space
   classes = list()
+  
+  # get the directories
   diretorios = directories(dataset_name, folderResults)
   
   # from the first FOLD to the last
   k = 1
   while(k<=number_folds){
-    #cat("\n\tFold: ", k)
+    
+    # cat("\n\tFold: ", k)
+    
     # enter folder train
     setwd(diretorios$folderCVTR)
-    # get the correct split
+    
+    # get the correct fold cross-validation
     nome_arquivo = paste(dataset_name, "-Split-Tr-", k, ".csv", sep="")
+    
+    # open the file
     arquivo = data.frame(read.csv(nome_arquivo))
+    
     # split label space from input space
     classes[[k]] = arquivo[,ds$LabelStart:ds$LabelEnd]
+    
+    # get the names labels
     namesLabels = c(colnames(classes[[k]]))
-    k = k + 1 # increment FOLD
-    gc() # garbage collection
+    
+    # increment FOLD
+    k = k + 1 
+    
+    # garbage collection
+    gc() 
+    
   } # End While of the 10-folds
   
+  # return results
   retorno$NamesLabels = namesLabels
   retorno$Classes = classes
   return(retorno)
+  
   gc()
   cat("\n##################################################################################################")
   cat("\n# FUNCTION LABEL SPACE: END                                                                      #") 
@@ -346,17 +486,19 @@ labelSpace <- function(ds, dataset_name, number_folds, folderResults){
 }
 
 
-##################################################################################################
-# FUNCTION INFO DATA SET                                                                         #
-#  Objective                                                                                     #
-#     Gets the information that is in the "datasets.csv" file.                                    #  
-#  Parameters                                                                                    #
-#     dataset: the specific dataset                                                              #
-#  Return                                                                                        #
-#     Everything in the spreadsheet                                                              #
-##################################################################################################
+################################################################################################
+# FUNCTION INFO DATA SET                                                                       #
+#  Objective                                                                                   #
+#     Gets the information that is in the "datasets-hpmlk.csv" file.                           #  
+#  Parameters                                                                                  #
+#     dataset: the specific dataset                                                            #
+#  Return                                                                                      #
+#     Everything in the "datasets-hpmlk.csv" file.                                             #                    
+################################################################################################
 infoDataSet <- function(dataset){
+  
   retorno = list()
+  
   retorno$id = dataset$ID
   retorno$name = dataset$Name
   retorno$instances = dataset$Instances
@@ -381,12 +523,14 @@ infoDataSet <- function(dataset){
   retorno$xt = dataset$xt
   retorno$yt = dataset$yt
   retorno$gridt = dataset$gridt
+  
   return(retorno)
+  
   gc()
 }
 
 
 ##################################################################################################
-# Please, any errors, contact us!                                                                #
+# Please, any errors, contact us: elainececiliagatto@gmail.com                                   #
 # Thank you very much!                                                                           #
 ##################################################################################################
