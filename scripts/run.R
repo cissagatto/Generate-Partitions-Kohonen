@@ -111,8 +111,12 @@ gpkh <- function(number_dataset, number_cores, number_folds, folderResults){
   cat("\n\n################################################################################################")
   cat("\n# Runtime                                                                                        #")
   timesExecute = rbind(timeLabelSpace, timeKohonen)
-  setwd(diretorios$folderDatasetResults)
-  write.csv(timesExecute, paste(dataset_name, "RunTime-gpkh.csv", sep=""))
+  Folder = paste(diretorios$folderDatasetResults, "/", dataset_name, sep="")
+  if(dir.exists(Folder)==FALSE){
+    dir.create(Folder)
+  }
+  setwd(Folder)
+  write.csv(timesExecute, paste(dataset_name, "-RunTime-gpkh.csv", sep=""))
   cat("\n##################################################################################################\n\n")
   
   cat("\n\n################################################################################################")

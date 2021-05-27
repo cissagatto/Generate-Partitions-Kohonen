@@ -153,6 +153,11 @@ print(timeFinal)
 # timeFinal <- system.time(results <- gpkh(2, number_cores, number_folds, folderResults))
 
 
+##################################################################################################
+Folder = paste(diretorios$folderDatasetResults, "/", dataset_name, sep="")
+if(dir.exists(Folder)==FALSE){
+  dir.create(Folder)
+}
 
 ##################################################################################################
 cat("\nSave Rds\n")
@@ -178,40 +183,48 @@ print(system(str1))
 
 ##################################################################################################
 cat("\nCopy file tar \n")
-str2 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderDatasetResults, sep="")
+str2 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-results-gpkh.tar.gz ", Folder, sep="")
 print(system(str2))
 
 
 
 ########################################################################################################################
 cat("\n Copy Results to google drive")
-origem = diretorios$folderDatasetResults
 destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
-comando1 = paste("rclone -v copy ", origem, " ", destino, sep="")
+comando1 = paste("rclone -v copy ", Folder, " ", destino, sep="")
 system(comando1)
 
 
 ########################################################################################################################
 cat("\n Copy Outupt to google drive")
 origem = diretorios$folderOutputDataset
-destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, "/Output", sep="")
+destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
 comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
 system(comando2)
 
 
-
 ##################################################################################################
-cat("\nDelete folder \n")
+cat("\nDelete folder results temporary \n")
 str5 = paste("rm -r ", diretorios$folderResults, sep="")
 print(system(str5))
 
 
+##################################################################################################
+cat("\nDelete folder output dataset \n")
+str6 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
+print(system(str6))
+
 
 ##################################################################################################
-#cat("\nDelete folder \n")
-#str4 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
-#print(system(str4))
+cat("\nDelete folder specific dataset \n")
+str7 = paste("rm -r ", diretorios$folderSpecificDataset, sep="")
+print(system(str7))
 
+
+##################################################################################################
+cat("\nDelete folder results \n")
+str7 = paste("rm -r ", Folder, sep="")
+print(system(str7))
 
 
 ##################################################################################################
