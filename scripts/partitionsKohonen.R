@@ -225,7 +225,7 @@ cat("\nClear!")
 gc()
 
 cat("\n##################################################################################################")
-cat("\n# END OF GENERATE PARTITIONS KOHOENEN. THANKS GOD !!                                             #")
+cat("\n# END OF GENERATE PARTITIONS KOHONEN. THANKS GOD !!                                             #")
 cat("\n##################################################################################################")
 cat("\n\n\n\n") 
 
