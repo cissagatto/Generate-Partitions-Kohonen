@@ -183,20 +183,20 @@ print(system(str2))
 
 
 
-########################################################################################################################
-cat("\n Copy Results to google drive")
-origem = diretorios$folderDatasetResults
-destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
-comando1 = paste("rclone -v copy ", origem, " ", destino, sep="")
-system(comando1)
+#########################################################################################################################
+#cat("\n Copy Results to google drive")
+#origem = diretorios$folderDatasetResults
+#destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
+#comando1 = paste("rclone -v copy ", origem, " ", destino, sep="")
+#system(comando1)
 
 
 ########################################################################################################################
-cat("\n Copy Outupt to google drive")
-origem = diretorios$folderOutputDataset
-destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, "/Output", sep="")
-comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
-system(comando2)
+#cat("\n Copy Outupt to google drive")
+#origem = diretorios$folderOutputDataset
+#destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, "/Output", sep="")
+#comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
+#system(comando2)
 
 
 
@@ -207,10 +207,10 @@ print(system(str5))
 
 
 
-##################################################################################################
-cat("\nDelete folder \n")
-str4 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
-print(system(str4))
+###################################################################################################
+#cat("\nDelete folder \n")
+#str4 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
+#print(system(str4))
 
 
 
