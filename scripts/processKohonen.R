@@ -1140,7 +1140,7 @@ generatedPartitionsKohonen <- function(ds, resLS, namesLabels, number_dataset, n
   
   cat("\n\n################################################################################################")
   cat("\n# Runtime                                                                                        #")
-  timesKohonen = rbind(timeMLC, timePLS, timeJoin, timeLPN, timeIPN, timeSEL, timeVGE, timeADS)
+  timesKohonen = rbind(timeMLC, timePLS, timeJoin, timeLPN, timeIPN, timeSEL, timeVGE)
   setwd(diretorios$folderDatasetResults)
   write.csv(timesKohonen, paste(dataset_name, "-generatedPartitionsKohonen-RunTime.csv"))
   cat("\n##################################################################################################\n\n")

@@ -115,7 +115,7 @@ cat("\nHPML-K: nome \t ", dataset_name)
 # number_dataset = ds$Id
 # number_cores = 10
 # number_folds = 10
-# folderResults = "/dev/shm/res"
+# folderResults = "/dev/shm/birds"
 ##################################################################################################
 
 
@@ -183,20 +183,20 @@ print(system(str2))
 
 
 
-#########################################################################################################################
-#cat("\n Copy Results to google drive")
-#origem = diretorios$folderDatasetResults
-#destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
-#comando1 = paste("rclone -v copy ", origem, " ", destino, sep="")
-#system(comando1)
+########################################################################################################################
+cat("\n Copy Results to google drive")
+origem = diretorios$folderDatasetResults
+destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
+comando1 = paste("rclone -v copy ", origem, " ", destino, sep="")
+system(comando1)
 
 
 ########################################################################################################################
-#cat("\n Copy Outupt to google drive")
-#origem = diretorios$folderOutputDataset
-#destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, "/Output", sep="")
-#comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
-#system(comando2)
+cat("\n Copy Outupt to google drive")
+origem = diretorios$folderOutputDataset
+destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, "/Output", sep="")
+comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
+system(comando2)
 
 
 
@@ -207,7 +207,7 @@ print(system(str5))
 
 
 
-###################################################################################################
+##################################################################################################
 #cat("\nDelete folder \n")
 #str4 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
 #print(system(str4))
@@ -225,7 +225,7 @@ cat("\nClear!")
 gc()
 
 cat("\n##################################################################################################")
-cat("\n# END OF GENERATE PARTITIONS KOHONEN. THANKS GOD !!                                             #")
+cat("\n# END OF GENERATE PARTITIONS KOHOENEN. THANKS GOD !!                                             #")
 cat("\n##################################################################################################")
 cat("\n\n\n\n") 
 
