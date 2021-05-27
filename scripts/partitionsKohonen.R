@@ -115,7 +115,7 @@ cat("\nHPML-K: nome \t ", dataset_name)
 # number_dataset = ds$Id
 # number_cores = 10
 # number_folds = 10
-# folderResults = "/dev/shm/birds"
+# folderResults = "/dev/shm/res"
 ##################################################################################################
 
 
