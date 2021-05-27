@@ -121,8 +121,6 @@ cat("\nHPML-K: nome \t ", dataset_name)
 
 
 ##################################################################################################
-# CONFIG THE FOLDER RESULTS                                                                      #
-##################################################################################################
 cat("\nCreate Folder")
 if(dir.exists(folderResults)==FALSE){
   dir.create(folderResults)
@@ -131,16 +129,12 @@ if(dir.exists(folderResults)==FALSE){
 
 
 ##################################################################################################
-# LOAD RUN.R                                                                                     #
-##################################################################################################
 cat("\nLoad sources")
 setwd(FolderScripts)
 source("run.R") 
 
 
 
-##################################################################################################
-#
 ##################################################################################################
 cat("\nGet directories")
 diretorios = directories(dataset_name, folderResults)
@@ -159,36 +153,29 @@ print(timeFinal)
 # timeFinal <- system.time(results <- gpkh(2, number_cores, number_folds, folderResults))
 
 
-##################################################################################################
-# save the total time in rds format in the dataset folder                                        #
+
 ##################################################################################################
 cat("\nSave Rds\n")
-str0 <- paste(diretorios$folderResults, "/", dataset_name, "-results-gpkh.rds", sep="")
+str3 <- paste(diretorios$folderResults, "/", dataset_name, "-results-gpkh.rds", sep="")
+save(results, file = str3)
+
+
+
+##################################################################################################
+cat("\nSave Rdata \n")
+str0 <- paste(diretorios$folderResults, "/", dataset_name, "-results-gpkh.RData", sep="")
 save(results, file = str0)
 
 
 
 ##################################################################################################
-# save results in RDATA form in the dataset folder                                               #
-##################################################################################################
-cat("\nSave Rdata \n")
-str1 <- paste(diretorios$folderResults, "/", dataset_name, "-results-gpkh.RData", sep="")
-save(results, file = str1)
-
-
-
-##################################################################################################
-# compress the results for later transfer to the dataset folder                                  #
-##################################################################################################
 cat("\nCompress results \n")
 setwd(diretorios$folderResults)
-str = paste("tar -zcvf ", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderResults, sep="")
-print(system(str))
+str1 = paste("tar -zcvf ", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderResults, sep="")
+print(system(str1))
 
 
 
-##################################################################################################
-# copy file                                                                                      #
 ##################################################################################################
 cat("\nCopy file tar \n")
 str2 = paste("cp ", diretorios$folderResults, "/", dataset_name, "-results-gpkh.tar.gz ", diretorios$folderDatasetResults, sep="")
@@ -197,29 +184,48 @@ print(system(str2))
 
 
 ########################################################################################################################
-cat("\n Copy to google drive")
+cat("\n Copy Results to google drive")
 origem = diretorios$folderDatasetResults
-destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen-HClust/", dataset_name, sep="")
-comando = paste("rclone -v copy ", origem, " ", destino, sep="")
-system(comando)
+destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
+comando1 = paste("rclone -v copy ", origem, " ", destino, sep="")
+system(comando1)
+
+
+########################################################################################################################
+cat("\n Copy Outupt to google drive")
+origem = diretorios$folderOutputDataset
+destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, "/Output", sep="")
+comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
+system(comando2)
 
 
 
-##################################################################################################
-# del                                                                                      #
 ##################################################################################################
 cat("\nDelete folder \n")
 str5 = paste("rm -r ", diretorios$folderResults, sep="")
 print(system(str5))
 
+
+
+##################################################################################################
+cat("\nDelete folder \n")
+str4 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
+print(system(str4))
+
+
+
+##################################################################################################
 cat("\nDel objects")
 rm(list = ls())
 
+
+
+##################################################################################################
 cat("\nClear!")
 gc()
 
 cat("\n##################################################################################################")
-cat("\n# END OF HPML-K. THANKS GOD !!                                                                   #")
+cat("\n# END OF GENERATE PARTITIONS KOHOENEN. THANKS GOD !!                                             #")
 cat("\n##################################################################################################")
 cat("\n\n\n\n") 
 

@@ -913,7 +913,13 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
     partition = c(0)
     new.num.groups = c(0)
     resumePartitions = data.frame(fold, partition, new.num.groups)
+
+    ############################################################################################################
+    group = c(0)
+    label = c(0)
+    allPartitions = data.frame(group, label)
     
+    ############################################################################################################    
     labelsPerGroups = data.frame()
     
     #cat("\nNumber of partitions")
@@ -1015,9 +1021,6 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
           group = nomesGrupos[w]
           labelsPerGroups2 = rbind(labelsPerGroups2, data.frame(group, totalLabelsGroup))
           
-          #setwd(FolderOutPutPartition)
-          #write.csv(rotulosNesteGrupo, paste("labels-in-group-", y, ".csv", sep=""))
-          
         }
         
         w = w + 1
@@ -1032,6 +1035,14 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
       setwd(FolderOutPutPartition)
       write.csv(particao2, paste("partition-", p, ".csv", sep=""), row.names = FALSE)
       
+      particao3 = particao2[order(particao2$label, decreasing = FALSE),]
+      nomesDosRotulos = particao3$label
+      group = particao3$group
+      allPartitions = cbind(allPartitions, group)
+      
+      setwd(FolderPartition)
+      write.csv(particao3, paste("fold-",f,"-partition-", p, ".csv", sep=""), row.names = FALSE)
+      
       p = p + 1 # increment partition
       
       if(interactive()==TRUE){ flush.console() }
@@ -1040,10 +1051,30 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
       
     } # fim partition
     
-    setwd(FolderOutPutSplit)
     resumePartitions2 = resumePartitions[-1,]
     names(resumePartitions2)[3] = "num.groups"
+    
+    setwd(FolderOutPutSplit)
     write.csv(resumePartitions2, paste("fold-",f,"-groups-per-partition.csv", sep=""), row.names = FALSE)
+    
+    setwd(FolderSplit)
+    write.csv(resumePartitions2, paste("fold-",f,"-groups-per-partition.csv", sep=""), row.names = FALSE)
+    
+    u = 2
+    nomesParticoes = c("")
+    while(u<=num.part){
+      nomesParticoes[u] = paste("partition-", u, sep="")
+      u = u + 1
+    }
+    
+    colnames(allPartitions) = c("label", nomesParticoes)
+    allPartitions$label = nomesDosRotulos
+    
+    setwd(FolderOutPutSplit)
+    write.csv(allPartitions, paste("fold-",f,"-all-partitions.csv", sep=""), row.names = FALSE)
+    
+    setwd(FolderSplit)
+    write.csv(allPartitions, paste("fold-",f,"-all-partitions.csv", sep=""), row.names = FALSE)
     
     if(interactive()==TRUE){ flush.console() }
     gc()
@@ -1058,8 +1089,6 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
   cat("\n##################################################################################################")
   cat("\n\n\n\n")
 }
-
-
 
 #############################################################################################################
 # FUNCTION 
@@ -1111,7 +1140,7 @@ generatedPartitionsKohonen <- function(ds, resLS, namesLabels, number_dataset, n
   
   cat("\n\n################################################################################################")
   cat("\n# Runtime                                                                                        #")
-  timesKohonen = rbind(timeMLC, timePLS, timeJoin, timeLPN, timeIPN, timeSEL, timeVGE)
+  timesKohonen = rbind(timeMLC, timePLS, timeJoin, timeLPN, timeIPN, timeSEL, timeVGE, timeADS)
   setwd(diretorios$folderDatasetResults)
   write.csv(timesKohonen, paste(dataset_name, "-generatedPartitionsKohonen-RunTime.csv"))
   cat("\n##################################################################################################\n\n")
