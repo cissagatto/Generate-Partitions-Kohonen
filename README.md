@@ -3,7 +3,7 @@ This code is part of my PhD at PPG-CC/DC/UFSCar. The aim is generate hybrid part
 
 The figure bellow shows the fluxogram for this code:
 
-<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/generate_partitions_kohonen_2.png" width="300">
+<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/generate_partitions_kohonen_3.png" width="300">
 
 ## Scripts
 This source code consists of an R project for R Studio and the following R scripts:
