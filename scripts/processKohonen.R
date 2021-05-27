@@ -1071,10 +1071,10 @@ verifyGroupsEmpty <- function(ds, namesLabels, folderResults){
     allPartitions$label = nomesDosRotulos
     
     setwd(FolderOutPutSplit)
-    write.csv(allPartitions, paste("fold-",f,"-all-partitions.csv", sep=""), row.names = FALSE)
+    write.csv(allPartitions[,-2], paste("fold-",f,"-all-partitions.csv", sep=""), row.names = FALSE)
     
     setwd(FolderSplit)
-    write.csv(allPartitions, paste("fold-",f,"-all-partitions.csv", sep=""), row.names = FALSE)
+    write.csv(allPartitions[,2], paste("fold-",f,"-all-partitions.csv", sep=""), row.names = FALSE)
     
     if(interactive()==TRUE){ flush.console() }
     gc()
