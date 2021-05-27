@@ -61,7 +61,7 @@ _Then the experiment was executed in a cluster at UFSCar._
 
 
 ## Results
-The results stored in the folder _OUTPUT_ it will be used in the next phase: Best-Partition-Silhoute or Best-Partition-MacroF1. The result for a dataset must be put in the folder _PARTITIONS_ in the code https://github.com/cissagatto/Best-Partition-Silhouete.
+The results are store in the folder _RESULTS_. The results stored in the folder _OUTPUT_ it will be used in the next phase: Best-Partition-Silhoute or Best-Partition-MacroF1. The result for a dataset must be put in the folder _PARTITIONS_ in the code https://github.com/cissagatto/Best-Partition-Silhouete.
 
 <img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/results_structure_gpk.png" width="300">
 
