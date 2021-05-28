@@ -85,10 +85,11 @@ gpkh <- function(number_dataset, number_cores, number_folds, folderResults){
   
   cat("\n\n################################################################################################")
   cat("\n#Run: Get dataset information: ", number_dataset, "                                              #")
-  ds = datasets[number_dataset,]
+  ds <- filter(datasets, datasets$Id == number_dataset)
   names(ds)[1] = "Id"
   info = infoDataSet(ds)
   dataset_name = toString(ds$Name)
+  print(dataset_name)
   cat("\n##################################################################################################\n\n") 
   
   cat("\n\n################################################################################################")

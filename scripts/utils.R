@@ -520,9 +520,6 @@ infoDataSet <- function(dataset){
   retorno$xn = dataset$xn
   retorno$yn = dataset$yn
   retorno$gridn = dataset$gridn
-  retorno$xt = dataset$xt
-  retorno$yt = dataset$yt
-  retorno$gridt = dataset$gridt
   
   return(retorno)
   

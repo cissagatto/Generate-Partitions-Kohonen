@@ -71,7 +71,7 @@ args <- commandArgs(TRUE)
 ##################################################################################################
 # Get dataset information                                                                        #
 ##################################################################################################
-ds <- datasets[as.numeric(args[1]),]
+ds <- data.frame(filter(datasets, datasets$Id == as.numeric(args[1])))
 cat("\nHPML-K DS \t ", as.numeric(args[1]))
 
 
@@ -110,12 +110,12 @@ cat("\nHPML-K: nome \t ", dataset_name)
 
 ##################################################################################################
 # DON'T RUN -- it's only for test the code
-# ds = datasets[2,]
+# ds <- filter(datasets, datasets$Id == 74)
 # dataset_name = ds$Name
 # number_dataset = ds$Id
 # number_cores = 10
 # number_folds = 10
-# folderResults = "/dev/shm/birds"
+# folderResults = "/dev/shm/res"
 ##################################################################################################
 
 
@@ -210,9 +210,9 @@ print(system(str5))
 
 
 ##################################################################################################
-#cat("\nDelete folder output dataset \n")
-#str6 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
-#print(system(str6))
+cat("\nDelete folder output dataset \n")
+str6 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
+print(system(str6))
 
 
 ##################################################################################################
@@ -222,9 +222,9 @@ print(system(str7))
 
 
 ###################################################################################################
-#cat("\nDelete folder results \n")
-#str7 = paste("rm -r ", Folder, sep="")
-#print(system(str7))
+cat("\nDelete folder results \n")
+str7 = paste("rm -r ", Folder, sep="")
+print(system(str7))
 
 
 ##################################################################################################
