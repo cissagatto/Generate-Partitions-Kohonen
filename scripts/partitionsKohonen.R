@@ -190,7 +190,7 @@ print(system(str2))
 
 ########################################################################################################################
 cat("\n Copy Results to google drive")
-destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
+destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
 comando1 = paste("rclone -v copy ", Folder, " ", destino, sep="")
 print(system(comando1))
 
@@ -198,7 +198,7 @@ print(system(comando1))
 ########################################################################################################################
 cat("\n Copy Outupt to google drive")
 origem = diretorios$folderOutputDataset
-destino = paste("cloud:[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
+destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
 comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
 print(system(comando2))
 
