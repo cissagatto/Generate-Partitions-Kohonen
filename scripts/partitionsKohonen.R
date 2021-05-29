@@ -71,7 +71,7 @@ args <- commandArgs(TRUE)
 ##################################################################################################
 # Get dataset information                                                                        #
 ##################################################################################################
-ds <- data.frame(filter(datasets, datasets$Id == as.numeric(args[1])))
+ds <- datasets[args[1],]
 cat("\nHPML-K DS \t ", as.numeric(args[1]))
 
 
@@ -110,7 +110,7 @@ cat("\nHPML-K: nome \t ", dataset_name)
 
 ##################################################################################################
 # DON'T RUN -- it's only for test the code
-# ds <- filter(datasets, datasets$Id == 74)
+# ds <- datasets[29,]
 # dataset_name = ds$Name
 # number_dataset = ds$Id
 # number_cores = 10
@@ -150,7 +150,7 @@ timeFinal <- system.time(results <- gpkh(args[1], number_cores, number_folds, fo
 print(timeFinal)
 
 # DO NOT RUN
-# timeFinal <- system.time(results <- gpkh(2, number_cores, number_folds, folderResults))
+# timeFinal <- system.time(results <- gpkh(number_dataset, number_cores, number_folds, folderResults))
 
 
 ##################################################################################################
