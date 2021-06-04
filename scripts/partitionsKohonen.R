@@ -40,7 +40,6 @@ if (sistema[1] == "Linux"){
 FolderScripts = paste(FolderRoot, "/scripts", sep="")
 
 
-
 ##################################################################################################
 # Options Configuration                                                                          #
 ##################################################################################################
@@ -48,7 +47,6 @@ cat("\nR options config")
 options(java.parameters = "-Xmx32g")
 options(show.error.messages = TRUE)
 options(scipen=30)
-
 
 
 ##################################################################################################
@@ -59,13 +57,11 @@ setwd(FolderRoot)
 datasets <- data.frame(read.csv("datasets-hpml-k.csv"))
 
 
-
 ##################################################################################################
 # ARGS COMMAND LINE                                                                              #
 ##################################################################################################
 cat("\nGet Args")
 args <- commandArgs(TRUE)
-
 
 
 ##################################################################################################
@@ -75,13 +71,11 @@ ds <- datasets[args[1],]
 cat("\nHPML-K DS \t ", as.numeric(args[1]))
 
 
-
 ##################################################################################################
 # Get the number of cores                                                                        #
 ##################################################################################################
 number_cores <- as.numeric(args[2])
 cat("\nHPML-K: cores \t ", number_cores)
-
 
 
 ##################################################################################################
@@ -91,7 +85,6 @@ number_folds <- as.numeric(args[3])
 cat("\nHPML-K: folds \t ", number_folds)
 
 
-
 ##################################################################################################
 # Get the number of folds                                                                        #
 ##################################################################################################
@@ -99,13 +92,11 @@ folderResults <- toString(args[4])
 cat("\nHPML-K: folder \t ", folderResults)
 
 
-
 ##################################################################################################
 # Get dataset name                                                                               #
 ##################################################################################################
 dataset_name <- toString(ds$Name) 
 cat("\nHPML-K: nome \t ", dataset_name)
-
 
 
 ##################################################################################################
@@ -119,7 +110,6 @@ cat("\nHPML-K: nome \t ", dataset_name)
 ##################################################################################################
 
 
-
 ##################################################################################################
 cat("\nCreate Folder")
 if(dir.exists(folderResults)==FALSE){
@@ -127,12 +117,10 @@ if(dir.exists(folderResults)==FALSE){
 }
 
 
-
 ##################################################################################################
 cat("\nLoad sources")
 setwd(FolderScripts)
 source("run.R") 
-
 
 
 ##################################################################################################
@@ -189,18 +177,18 @@ print(system(str2))
 
 
 ########################################################################################################################
-cat("\n Copy Results to google drive")
-destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
-comando1 = paste("rclone -v copy ", Folder, " ", destino, sep="")
-print(system(comando1))
+#cat("\n Copy Results to google drive")
+#destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
+#comando1 = paste("rclone -v copy ", Folder, " ", destino, sep="")
+#print(system(comando1))
 
 
 ########################################################################################################################
-cat("\n Copy Outupt to google drive")
-origem = diretorios$folderOutputDataset
-destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
-comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
-print(system(comando2))
+#cat("\n Copy Outupt to google drive")
+#origem = diretorios$folderOutputDataset
+#destino = paste("cloud:elaine/[2021]ResultadosExperimentos/Generate-Partitions-Kohonen/", dataset_name, sep="")
+#comando2 = paste("rclone -v copy ", origem, " ", destino, sep="")
+#print(system(comando2))
 
 
 ##################################################################################################
@@ -210,21 +198,21 @@ print(system(str5))
 
 
 ##################################################################################################
-cat("\nDelete folder output dataset \n")
-str6 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
-print(system(str6))
+#cat("\nDelete folder output dataset \n")
+#str6 = paste("rm -r ", diretorios$folderOutputDataset, sep="")
+#print(system(str6))
 
 
 ##################################################################################################
-cat("\nDelete folder specific dataset \n")
-str7 = paste("rm -r ", diretorios$folderSpecificDataset, sep="")
-print(system(str7))
+#cat("\nDelete folder specific dataset \n")
+#str7 = paste("rm -r ", diretorios$folderSpecificDataset, sep="")
+#print(system(str7))
 
 
 ###################################################################################################
-cat("\nDelete folder results \n")
-str7 = paste("rm -r ", Folder, sep="")
-print(system(str7))
+#cat("\nDelete folder results \n")
+#str7 = paste("rm -r ", Folder, sep="")
+#print(system(str7))
 
 
 ##################################################################################################
