@@ -71,7 +71,7 @@ The results are store in the folder _RESULTS_. The results stored in the folder 
 To run the code, open the terminal, enter */home/[username]/Generate-Partitions-Kohonen/scripts/* folder, and type:
 
 ```
-Rscript partitionsKohonen.R [number_dataset] [number_cores] [number_folds] [name_folder_results]
+Rscript kohonen.R [number_dataset] [number_cores] [number_folds] [name_folder_results]
 ```
 
 Where:
@@ -87,7 +87,7 @@ _name_folders_results is the name of the folder to save the results
 All parameters are mandatory. Example:
 
 ```
-Rscript partitionsKohonen.R 17 5 10 /dev/shm/results/flags
+Rscript kohonen.R 17 5 10 /dev/shm/results/flags
 ```
 
 This will execute the code for the dataset number 17 in the _dataset-hpmlk.csv_, with 5 cores, 10 folds and the process will be store in the _/dev/shm/results/flags_. This code automatically makes a copy of the */dev/shm/results/flags* in the folder *Results* - which is in the root of the project. In this way, you can run the code using a temporary folder, like *scratch* and *shm*, to speed up the execution.
