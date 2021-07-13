@@ -1,4 +1,4 @@
-# Generate Hybrid Partitions with Kohonen and HClust
+# Generate Hybrid Partitions with Kohonen
 This code is part of my PhD at PPG-CC/DC/UFSCar. The aim is generate hybrid partitions for multilabel classification using Kohonen to modeling the label correlations, and HClust to partitioning the label space (accordingly with the modeled label correlations).
 
 The figure bellow shows the fluxogram for this code:
