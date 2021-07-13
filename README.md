@@ -1,9 +1,9 @@
 # Generate Hybrid Partitions with Kohonen
 This code is part of my PhD at PPG-CC/DC/UFSCar. The aim is generate hybrid partitions for multilabel classification using Kohonen.
 
-# Kohonen Partitions
+## Kohonen Partitions
 
-<img src="" width="500">
+<img src="" width="100">
 
 ## Scripts
 This source code consists of an R project for R Studio and the following R scripts:
