@@ -40,6 +40,7 @@ if (sistema[1] == "Linux"){
 FolderScripts = paste(FolderRoot, "/scripts", sep="")
 
 
+
 ##################################################################################################
 # Options Configuration                                                                          #
 ##################################################################################################
@@ -49,12 +50,14 @@ options(show.error.messages = TRUE)
 options(scipen=30)
 
 
+
 ##################################################################################################
 # Read the dataset file with the information for each dataset                                    #
 ##################################################################################################
 cat("\nOpen datasets")
 setwd(FolderRoot)
-datasets <- data.frame(read.csv("datasets-hpml-k.csv"))
+datasets <- data.frame(read.csv("datasets.csv"))
+
 
 
 ##################################################################################################
@@ -64,11 +67,13 @@ cat("\nGet Args")
 args <- commandArgs(TRUE)
 
 
+
 ##################################################################################################
 # Get dataset information                                                                        #
 ##################################################################################################
-ds <- datasets[args[1],]
+ds <- datasets[as.numeric(args[1]),]
 cat("\nHPML-K DS \t ", as.numeric(args[1]))
+
 
 
 ##################################################################################################
@@ -78,11 +83,13 @@ number_cores <- as.numeric(args[2])
 cat("\nHPML-K: cores \t ", number_cores)
 
 
+
 ##################################################################################################
 # Get the number of folds                                                                        #
 ##################################################################################################
 number_folds <- as.numeric(args[3])
 cat("\nHPML-K: folds \t ", number_folds)
+
 
 
 ##################################################################################################
@@ -92,11 +99,13 @@ folderResults <- toString(args[4])
 cat("\nHPML-K: folder \t ", folderResults)
 
 
+
 ##################################################################################################
 # Get dataset name                                                                               #
 ##################################################################################################
 dataset_name <- toString(ds$Name) 
 cat("\nHPML-K: nome \t ", dataset_name)
+
 
 
 ##################################################################################################
@@ -110,6 +119,20 @@ cat("\nHPML-K: nome \t ", dataset_name)
 ##################################################################################################
 
 
+
+
+##################################################################################################
+#cat("\n\nCopy FROM google drive:\n\n")
+#destino = paste(FolderRoot, "/datasets/", dataset_name, sep="")
+#origem = paste("cloud:elaine/Datasets/CrossValidation_WithValidation/", dataset_name, sep="")
+#comando = paste("rclone -v copy ", origem, " ", destino, sep="")
+#cat("\n\nCOMANDO:", comando, "\n\n")
+#print(system(comando))
+#cat("\n\n")
+
+
+
+
 ##################################################################################################
 cat("\nCreate Folder")
 if(dir.exists(folderResults)==FALSE){
@@ -117,10 +140,12 @@ if(dir.exists(folderResults)==FALSE){
 }
 
 
+
 ##################################################################################################
 cat("\nLoad sources")
 setwd(FolderScripts)
 source("run.R") 
+
 
 
 ##################################################################################################
@@ -192,9 +217,9 @@ print(system(str2))
 
 
 ##################################################################################################
-cat("\nDelete folder results temporary \n")
-str5 = paste("rm -r ", diretorios$folderResults, sep="")
-print(system(str5))
+#cat("\nDelete folder results temporary \n")
+#str5 = paste("rm -r ", diretorios$folderResults, sep="")
+#print(system(str5))
 
 
 ##################################################################################################
