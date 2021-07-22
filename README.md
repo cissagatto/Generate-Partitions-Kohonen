@@ -1,9 +1,14 @@
 # Generate Hybrid Partitions with Kohonen
 This code is part of my PhD at PPG-CC/DC/UFSCar. The aim is generate hybrid partitions for multilabel classification using Kohonen.
 
-## Kohonen Partitions
+## Kohonen Partitions with Macro-F1
+<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/HPML-KS-branco.png" width="100">
 
-<img src="" width="100">
+## Kohonen Partitions with Micro-F1
+<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/HPML-KMi-Branco.png" width="100">
+
+## Kohonen Partitions with Silhouete
+<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/HPML-JS-branco.png" width="100">
 
 ## Scripts
 This source code consists of an R project for R Studio and the following R scripts:
