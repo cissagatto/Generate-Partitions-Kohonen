@@ -1,6 +1,9 @@
 # Generate Hybrid Partitions with Kohonen
 This code is part of my PhD at PPG-CC/DC/UFSCar. The aim is generate hybrid partitions for multilabel classification using Kohonen.
 
+## Types of Hybrid Partitions
+<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/tipos_particoes_hibridas_transparente.png" width="100">
+
 ## Kohonen Partitions with Macro-F1
 <img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/HPML-KMa-Branco.png" width="100">
 
