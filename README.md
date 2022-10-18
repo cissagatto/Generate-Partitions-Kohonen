@@ -4,17 +4,6 @@ This code is part of my PhD at PPG-CC/DC/UFSCar. The aim is generate hybrid part
 ## How to cite 
 @misc{Gatto2021, author = {Gatto, E. C.}, title = {Generate Kohonen Partitions for Multilabel Classification}, year = {2021}, publisher = {GitHub}, journal = {GitHub repository}, howpublished = {\url{https://github.com/cissagatto/Generate-Partitions-Kohonen}}}
 
-## Types of Hybrid Partitions
-<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/tipos_particoes_hibridas_transparente.png" width="300">
-
-## Kohonen Partitions with Macro-F1
-<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/HPML-KMa-Branco.png" width="100">
-
-## Kohonen Partitions with Micro-F1
-<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/HPML-KMi-Branco.png" width="100">
-
-## Kohonen Partitions with Silhouete
-<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/HPML-KS-branco.png" width="100">
 
 ## Scripts
 This source code consists of an R project for R Studio and the following R scripts:
@@ -47,9 +36,6 @@ Confirms if the folder UTILS contains the following files: Clus.jar, R_csv_2_arf
 
 NOTE: Please, pay attention to the *datasets-hpmlk.csv* names and the names in the CSV file. They must be the same, on the contrary, an error may occur.
 
-## Folder Strucutre
-
-<img src="https://github.com/cissagatto/Generate-Partitions-Kohonen/blob/main/images/Folders-Kohonen.png" width="300">
 
 ## Software Requirements
 This code was develop in RStudio Version 1.4.1106 © 2009-2021 RStudio, PBC "Tiger Daylily" (2389bc24, 2021-02-11) for Ubuntu Bionic Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) QtWebEngine/5.12.8 Chrome/69.0.3497.128 Safari/537.36. The R Language version was: R version 4.1.0 (2021-05-18) -- "Camp Pontanezen" Copyright (C) 2021 The R Foundation for Statistical Computing Platform: x86_64-pc-linux-gnu (64-bit).
@@ -68,9 +54,6 @@ Host: bionote | Kernel: 5.8.0-53-generic | x86_64 bits: 64 | Desktop: Gnome 3.36
 Topology: 6-Core | model: Intel Core i7-10750H | bits: 64 | type: MT MCP | L2 cache: 12.0 MiB | Speed: 800 MHz | min/max: 800/5000 MHz Core speeds (MHz): | 1: 800 | 2: 800 | 3: 800 | 4: 800 | 5: 800 | 6: 800 | 7: 800 | 8: 800 | 9: 800 | 10: 800 | 11: 800 | 12: 800 |
 
 Then the experiment was executed in a cluster at UFSCar.
-
-Important: we used the CLUS classifier in this experiment. This implies generating all physical ARFF training, validating, and testing files for each of the generated random partitions. Our code generates the partitions first in memory and then saves them to the HD. However, to avoid memory problems, immediately after saving to HD, the files are validated (or tested) and then deleted. Even so, make sure you have enough space on your HD and RAM for this procedure.
-
 
 ## Results
 The results are store in the folder _RESULTS_. The results stored in the folder _OUTPUT_ it will be used in the next phase: Best-Partition-Silhoute or Best-Partition-MacroF1. The result for a dataset must be put in the folder _PARTITIONS_ in the code https://github.com/cissagatto/Best-Partition-Silhouete.
